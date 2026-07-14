@@ -1,0 +1,37 @@
+services:
+  web:
+    image: ghcr.io/happydevrd/iridiscencia-web:latest
+    container_name: iridiscencia-web
+    restart: unless-stopped
+    volumes:
+      - /volume1/Galeria:/usr/share/nginx/html/galeria:ro
+    networks:
+      - web
+    mem_limit: 48m
+
+  gallery-sync:
+    build: ./gallery-sync
+    container_name: iridiscencia-gallery-sync
+    restart: unless-stopped
+    volumes:
+      - /volume1/Galeria:/galeria
+    mem_limit: 48m
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: iridiscencia-watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json:ro
+    environment:
+      WATCHTOWER_SCHEDULE: "0 0 0 * * *"
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_INCLUDE_STOPPED: "false"
+      DOCKER_CONFIG: /config.json
+    command: iridiscencia-web
+    mem_limit: 32m
+
+networks:
+  web:
+    name: iridiscencia-web-net
