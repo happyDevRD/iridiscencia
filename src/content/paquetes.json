@@ -1,0 +1,28 @@
+{
+  "paquetes": [
+    {
+      "id": "bodas",
+      "nombre": "Bodas",
+      "descripcion": "Cobertura completa de tu boda, desde los preparativos hasta la fiesta.",
+      "precioDesde": "Consultar"
+    },
+    {
+      "id": "xv-anos",
+      "nombre": "XV Años",
+      "descripcion": "Sesión de estudio + cobertura de la celebración.",
+      "precioDesde": "Consultar"
+    },
+    {
+      "id": "corporativo",
+      "nombre": "Corporativo",
+      "descripcion": "Retratos de equipo, eventos empresariales y cobertura institucional.",
+      "precioDesde": "Consultar"
+    },
+    {
+      "id": "retratos",
+      "nombre": "Retratos",
+      "descripcion": "Sesión de estudio o exteriores, individual o familiar.",
+      "precioDesde": "Consultar"
+    }
+  ]
+}
