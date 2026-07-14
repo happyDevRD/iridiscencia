@@ -1,0 +1,44 @@
+backend:
+  name: github
+  repo: happyDevRD/iridiscencia
+  branch: main
+
+media_folder: "public/media"
+public_folder: "/media"
+
+collections:
+  - name: "site"
+    label: "Sitio"
+    files:
+      - name: "general"
+        label: "Información general"
+        file: "src/content/site.json"
+        fields:
+          - { label: "Nombre", name: "nombre", widget: "string" }
+          - { label: "Eslogan", name: "eslogan", widget: "string" }
+          - { label: "Descripción", name: "descripcion", widget: "text" }
+          - label: "Contacto"
+            name: "contacto"
+            widget: "object"
+            fields:
+              - { label: "Email", name: "email", widget: "string" }
+              - { label: "Teléfono", name: "telefono", widget: "string", required: false }
+              - { label: "Instagram", name: "instagram", widget: "string", required: false }
+              - { label: "Dirección", name: "direccion", widget: "string", required: false }
+
+  - name: "paquetes"
+    label: "Paquetes"
+    files:
+      - name: "lista"
+        label: "Lista de paquetes"
+        file: "src/content/paquetes.json"
+        fields:
+          - label: "Paquetes"
+            name: "paquetes"
+            widget: "list"
+            summary: "{{nombre}}"
+            fields:
+              - { label: "Identificador", name: "id", widget: "string" }
+              - { label: "Nombre", name: "nombre", widget: "string" }
+              - { label: "Descripción", name: "descripcion", widget: "text" }
+              - { label: "Precio desde", name: "precioDesde", widget: "string" }
