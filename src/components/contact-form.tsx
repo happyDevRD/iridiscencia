@@ -1,7 +1,7 @@
-"use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -13,7 +13,7 @@ export function ContactForm() {
     setStatus("sending");
 
     const formData = new FormData(e.currentTarget);
-    formData.append("access_key", process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "");
+    formData.append("access_key", import.meta.env.VITE_WEB3FORMS_KEY ?? "");
 
     try {
       const res = await fetch("https://api.web3forms.com/submit", {
@@ -34,7 +34,7 @@ export function ContactForm() {
 
   if (status === "sent") {
     return (
-      <p className="text-center text-white/80">
+      <p className="rounded-xl border border-border bg-card p-6 text-center text-foreground">
         ¡Gracias! Recibimos tu mensaje y te contactaremos pronto.
       </p>
     );
@@ -42,32 +42,19 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <input
-        name="nombre"
-        type="text"
-        placeholder="Nombre"
-        required
-        className="w-full border border-white/20 bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:border-white/50 focus:outline-none"
-      />
-      <input
-        name="email"
-        type="email"
-        placeholder="Correo electrónico"
-        required
-        className="w-full border border-white/20 bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:border-white/50 focus:outline-none"
-      />
-      <textarea
+      <Input name="nombre" type="text" placeholder="Nombre" required />
+      <Input name="email" type="email" placeholder="Correo electrónico" required />
+      <Textarea
         name="mensaje"
         placeholder="Cuéntanos sobre tu sesión (tipo de evento, fecha, etc.)"
         rows={5}
         required
-        className="w-full border border-white/20 bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:border-white/50 focus:outline-none"
       />
       <Button type="submit" size="lg" disabled={status === "sending"} className="w-full">
         {status === "sending" ? "Enviando…" : "Enviar mensaje"}
       </Button>
       {status === "error" && (
-        <p className="text-sm text-red-400">
+        <p className="text-sm text-destructive">
           Hubo un problema enviando el mensaje. Intenta de nuevo o escríbenos directo por correo.
         </p>
       )}

@@ -4,25 +4,29 @@
       "id": "bodas",
       "nombre": "Bodas",
       "descripcion": "Cobertura completa de tu boda, desde los preparativos hasta la fiesta.",
-      "precioDesde": "Consultar"
+      "precioDesde": "Consultar",
+      "imagen": "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&q=80&auto=format&fit=crop"
     },
     {
       "id": "xv-anos",
       "nombre": "XV Años",
       "descripcion": "Sesión de estudio + cobertura de la celebración.",
-      "precioDesde": "Consultar"
+      "precioDesde": "Consultar",
+      "imagen": "https://images.unsplash.com/photo-1714611302520-5afa2c3e26df?w=800&q=80&auto=format&fit=crop"
     },
     {
       "id": "corporativo",
       "nombre": "Corporativo",
       "descripcion": "Retratos de equipo, eventos empresariales y cobertura institucional.",
-      "precioDesde": "Consultar"
+      "precioDesde": "Consultar",
+      "imagen": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80&auto=format&fit=crop"
     },
     {
       "id": "retratos",
       "nombre": "Retratos",
       "descripcion": "Sesión de estudio o exteriores, individual o familiar.",
-      "precioDesde": "Consultar"
+      "precioDesde": "Consultar",
+      "imagen": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80&auto=format&fit=crop"
     }
   ]
 }

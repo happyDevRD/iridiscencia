@@ -1,5 +1,1 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+Proyecto Vite + React 19 + TypeScript + Tailwind CSS v4 — no Next.js. Sitio de una sola página con secciones ancladas (ver `src/App.tsx`), sin router. Estilo oscuro absoluto con GSAP y `motion` (Framer Motion) para animaciones.

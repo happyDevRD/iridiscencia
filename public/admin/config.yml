@@ -16,6 +16,7 @@ collections:
         fields:
           - { label: "Nombre", name: "nombre", widget: "string" }
           - { label: "Eslogan", name: "eslogan", widget: "string" }
+          - { label: "Ubicación", name: "ubicacion", widget: "string" }
           - { label: "Descripción", name: "descripcion", widget: "text" }
           - label: "Contacto"
             name: "contacto"
@@ -42,3 +43,4 @@ collections:
               - { label: "Nombre", name: "nombre", widget: "string" }
               - { label: "Descripción", name: "descripcion", widget: "text" }
               - { label: "Precio desde", name: "precioDesde", widget: "string" }
+              - { label: "Imagen", name: "imagen", widget: "image" }

@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Iridiscencia
 
-## Getting Started
+Sitio de una sola página para Iridiscencia, estudio de fotografía en San Pedro de Macorís (bodas, XV años, eventos corporativos y retratos).
 
-First, run the development server:
+## Stack
+
+React 19 + TypeScript + Vite + Tailwind CSS v4, con GSAP (ScrollTrigger) y `motion` (Framer Motion) para las animaciones. La galería de fotos se sirve por separado desde el NAS (ver `nas/`).
+
+## Comandos
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # servidor de desarrollo
+npm run build    # build de producción (dist/)
+npm run preview  # sirve el build de producción localmente
+npm run lint     # ESLint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Variables de entorno
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copiar `.env.example` a `.env.local`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `VITE_WEB3FORMS_KEY` — access key de [Web3Forms](https://web3forms.com/) para el formulario de contacto
+- `VITE_GALLERY_BASE_URL` — host donde vive la galería de fotos (nginx en el NAS, ver `nas/`)
 
-## Learn More
+## CMS
 
-To learn more about Next.js, take a look at the following resources:
+Sveltia CMS en `/admin` edita `src/content/site.json` y `src/content/paquetes.json` vía GitHub OAuth (config en `public/admin/config.yml`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Despliegue
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Cloudflare Pages, build `npm run build`, output `dist`.
