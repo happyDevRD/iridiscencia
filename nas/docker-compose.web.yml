@@ -1,0 +1,27 @@
+# Sitio iridiscencia.com servido desde el NAS (/volume1/docker/iridiscencia-web/docker-compose.yml).
+# La imagen se construye en house-pc y se envía con nas/deploy-web.sh, que fija WEB_TAG en .env.
+# El tráfico público llega por el Cloudflare Tunnel (red iridiscencia-web-net).
+services:
+  web:
+    image: iridiscencia-web:${WEB_TAG:-latest}
+    container_name: iridiscencia-web
+    restart: unless-stopped
+    volumes:
+      - /volume1/Galeria:/usr/share/nginx/html/galeria:ro
+      # catalogo.json que exporta ProStock (catalogo-export, ver docs/prostock-catalogo.md)
+      - /volume1/docker/iridiscencia-catalogo:/usr/share/nginx/html/catalogo:ro
+    networks:
+      - web
+    mem_limit: 48m
+
+  gallery-sync:
+    build: ./gallery-sync
+    container_name: iridiscencia-gallery-sync
+    restart: unless-stopped
+    volumes:
+      - /volume1/Galeria:/galeria
+    mem_limit: 48m
+
+networks:
+  web:
+    name: iridiscencia-web-net

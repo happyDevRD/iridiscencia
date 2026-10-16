@@ -6,7 +6,7 @@ Base de conocimiento para conectar el sitio (`iridiscencia.com`) con el sistema 
 
 | Pieza | Dónde | Notas |
 |---|---|---|
-| Sitio web | Este repo, Vite + React SPA estática, Cloudflare Pages | Los paquetes hoy salen de `src/content/paquetes.json` (4 entradas genéricas, precio "Consultar"), editables con Sveltia CMS. |
+| Sitio web | Este repo, Vite + React SPA estática, servida desde el NAS (contenedor `iridiscencia-web`, deploy con `nas/deploy-web.sh`) | Los paquetes hoy salen de `src/content/paquetes.json` (4 entradas genéricas, precio "Consultar"), editables con Sveltia CMS. |
 | ProStock (POS/inventario/facturación) | NAS DS420+ del estudio, `http://192.168.100.200:8080` (solo LAN o VPN) | Repos `happyDevRD/proStock` (backend Spring Boot) y `happyDevRD/proStockFront`. Compose en `/volume1/docker/prostock-irisdicencia/`. DB `prestockdb_iridiscencia`. |
 | Galería pública | Mismo NAS, `gallery-nginx` detrás del Cloudflare Tunnel `iridiscencia-nas` → `galeria.iridiscencia.com` | Ya es un origen público con CORS hacia `https://iridiscencia.com` (ver `nas/gallery-nginx/nginx.conf`). |
 
