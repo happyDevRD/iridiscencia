@@ -25,7 +25,7 @@ for cat_dir in "$GALERIA_DIR"/*/; do
     fname=$(basename "$foto")
     thumb="$cat_dir$THUMBS/$fname"
     if [ ! -f "$thumb" ] || [ "$foto" -nt "$thumb" ]; then
-      convert "$foto" -auto-orient -resize 600x600 -quality 82 "$thumb"
+      convert "$foto" -auto-orient -resize 1200x1200 -quality 80 "$thumb"
     fi
     fotos_json=$(echo "$fotos_json" | jq --arg src "/galeria/$cat_id/$fname" --arg thumb "/galeria/$cat_id/$THUMBS/$fname" '. += [{"src":$src,"thumb":$thumb}]')
   done

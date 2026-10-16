@@ -1,32 +1,58 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useId, useRef, useState } from "react";
+import paquetesData from "@/content/paquetes.json";
+import siteConfig from "@/content/site.json";
+import { COTIZAR_EVENT } from "@/lib/contact";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
+const TIPOS = [...paquetesData.paquetes.map((p) => p.nombre), "Otro"];
+
+function Field({ label, hint, children }: { label: string; hint?: string; children: (id: string) => React.ReactNode }) {
+  const id = useId();
+  return (
+    <div>
+      <label htmlFor={id} className="mb-2 block text-sm text-foreground/85">
+        {label}
+        {hint && <span className="text-muted-foreground"> ({hint})</span>}
+      </label>
+      {children(id)}
+    </div>
+  );
+}
+
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
+  const [tipo, setTipo] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // "Cotizar este paquete" sin WhatsApp configurado preselecciona el tipo aquí.
+  useEffect(() => {
+    function handleCotizar(e: Event) {
+      setTipo((e as CustomEvent<string>).detail);
+    }
+    window.addEventListener(COTIZAR_EVENT, handleCotizar);
+    return () => window.removeEventListener(COTIZAR_EVENT, handleCotizar);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
     setStatus("sending");
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     formData.append("access_key", import.meta.env.VITE_WEB3FORMS_KEY ?? "");
+    formData.append("subject", `Nueva cotización (${formData.get("tipo_evento") || "sin tipo"}) — ${siteConfig.nombre}`);
+    formData.append("from_name", "Web de Iridiscencia");
 
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData });
       const data = await res.json();
-      if (data.success) {
-        setStatus("sent");
-        e.currentTarget.reset();
-      } else {
-        setStatus("error");
-      }
+      if (!data.success) throw new Error(data.message);
+      form.reset();
+      setTipo("");
+      setStatus("sent");
     } catch {
       setStatus("error");
     }
@@ -34,28 +60,75 @@ export function ContactForm() {
 
   if (status === "sent") {
     return (
-      <p className="rounded-xl border border-border bg-card p-6 text-center text-foreground">
-        ¡Gracias! Recibimos tu mensaje y te contactaremos pronto.
-      </p>
+      <div className="border-t border-border pt-8" role="status">
+        <p className="font-display text-3xl">Mensaje enviado.</p>
+        <p className="mt-3 text-muted-foreground">Te escribimos al número que dejaste con la cotización.</p>
+        <button type="button" onClick={() => setStatus("idle")} className="mt-6 text-sm underline underline-offset-4">
+          Enviar otro mensaje
+        </button>
+      </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Input name="nombre" type="text" placeholder="Nombre" required />
-      <Input name="email" type="email" placeholder="Correo electrónico" required />
-      <Textarea
-        name="mensaje"
-        placeholder="Cuéntanos sobre tu sesión (tipo de evento, fecha, etc.)"
-        rows={5}
-        required
-      />
-      <Button type="submit" size="lg" disabled={status === "sending"} className="w-full">
-        {status === "sending" ? "Enviando…" : "Enviar mensaje"}
-      </Button>
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+      <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field label="Nombre">{(id) => <Input id={id} name="nombre" autoComplete="name" required />}</Field>
+        <Field label="WhatsApp o teléfono">
+          {(id) => <Input id={id} name="telefono" type="tel" autoComplete="tel" inputMode="tel" required />}
+        </Field>
+      </div>
+
+      <Field label="Correo" hint="opcional">
+        {(id) => <Input id={id} name="email" type="email" autoComplete="email" />}
+      </Field>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field label="Tipo de evento">
+          {(id) => (
+            <select
+              id={id}
+              name="tipo_evento"
+              required
+              value={tipo}
+              onChange={(e) => setTipo(e.target.value)}
+              className="flex h-11 w-full rounded-lg border border-input bg-background px-4 text-sm text-foreground outline-none focus-visible:border-ring"
+            >
+              <option value="" disabled>
+                Elige uno
+              </option>
+              {TIPOS.map((t) => (
+                <option key={t}>{t}</option>
+              ))}
+            </select>
+          )}
+        </Field>
+        <Field label="Fecha del evento" hint="si ya la tienes">
+          {(id) => <Input id={id} name="fecha" type="date" className="[color-scheme:dark]" />}
+        </Field>
+      </div>
+
+      <Field label="Cuéntanos del evento" hint="lugar, cantidad de horas, ideas">
+        {(id) => <Textarea id={id} name="mensaje" rows={4} />}
+      </Field>
+
+      <button
+        type="submit"
+        disabled={status === "sending"}
+        className="inline-flex h-12 w-full items-center justify-center rounded-full bg-foreground font-medium text-background transition-colors hover:bg-foreground/85 disabled:opacity-60"
+      >
+        {status === "sending" ? "Enviando…" : "Pedir cotización"}
+      </button>
+
       {status === "error" && (
-        <p className="text-sm text-destructive">
-          Hubo un problema enviando el mensaje. Intenta de nuevo o escríbenos directo por correo.
+        <p className="text-sm text-destructive" role="alert">
+          No se pudo enviar el mensaje. Escríbenos directo a{" "}
+          <a href={`mailto:${siteConfig.contacto.email}`} className="underline">
+            {siteConfig.contacto.email}
+          </a>
+          .
         </p>
       )}
     </form>

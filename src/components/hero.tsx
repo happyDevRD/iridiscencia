@@ -1,106 +1,142 @@
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 import siteConfig from "@/content/site.json";
-import paquetesData from "@/content/paquetes.json";
-import { Button } from "@/components/ui/button";
-import { useVideoLoopWindow } from "@/hooks/use-video-loop-window";
+import { ApertureIntro } from "@/components/aperture-intro";
+import { cotizarHref, whatsappUrl } from "@/lib/contact";
 
-// TODO: reemplazar por metraje real del estudio — este es un placeholder de stock.
-export const HERO_VIDEO_URL =
-  "https://res.cloudinary.com/deaqhxfwf/video/upload/v1781826138/A_cinematic_dolly_zoom_shot_moving_forward_into_a_-1781826029435_byivrw.mp4";
+const SLIDE_MS = 7000;
+const fotos = siteConfig.heroFotos;
 
-// Tramo estable "adentro" del lente de este clip de stock (dolly zoom de ida y
-// vuelta) — ajustar si se reemplaza por metraje real con otro timing.
-export const HERO_VIDEO_LOOP_START = 2.0;
-export const HERO_VIDEO_LOOP_END = 3.3;
+const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const servicios = paquetesData.paquetes.map((p) => p.nombre);
+/** Para fotos de Unsplash (placeholders) pide el ancho justo; las propias se sirven tal cual. */
+function srcSet(src: string) {
+  if (!src.includes("images.unsplash.com")) return undefined;
+  return [1280, 1920, 2560, 3200].map((w) => `${src}&w=${w} ${w}w`).join(", ");
+}
 
-export function Hero({ active }: { active: boolean }) {
-  const [index, setIndex] = useState(0);
-  const videoRef = useVideoLoopWindow(HERO_VIDEO_LOOP_START, HERO_VIDEO_LOOP_END);
+/**
+ * Mueve el "punto de luz" del nombre: sigue al puntero en escritorio y deriva
+ * despacio por sí solo en táctil. Con reduced motion queda fijo.
+ */
+function useIrisLight() {
+  const ref = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => setIndex((i) => (i + 1) % servicios.length), 2200);
-    return () => clearInterval(interval);
+    const el = ref.current;
+    if (!el || prefersReducedMotion()) return;
+
+    function set(xPct: number, yPct: number) {
+      el!.style.setProperty("--x", `${xPct}%`);
+      el!.style.setProperty("--y", `${yPct}%`);
+      el!.style.setProperty("--angle", `${90 + xPct * 1.8}deg`);
+    }
+
+    if (window.matchMedia("(hover: hover)").matches) {
+      function handleMove(e: PointerEvent) {
+        const r = el!.getBoundingClientRect();
+        set(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
+      }
+      window.addEventListener("pointermove", handleMove);
+      return () => window.removeEventListener("pointermove", handleMove);
+    }
+
+    let frame: number;
+    function drift(t: number) {
+      set(50 + Math.sin(t / 2600) * 42, 50 + Math.cos(t / 1900) * 30);
+      frame = requestAnimationFrame(drift);
+    }
+    frame = requestAnimationFrame(drift);
+    return () => cancelAnimationFrame(frame);
   }, []);
 
-  // El video arranca recién cuando el Hero es visible (loading screen ya se
-  // quitó) — si arrancara con autoPlay desde el montaje, para cuando el
-  // usuario ve el Hero el "snap" de ancho a adentro del lente ya pasó y solo
-  // se percibe el loop interno, sin la sensación de "entrar a la cámara".
+  return ref;
+}
+
+export function Hero() {
+  const [open, setOpen] = useState(prefersReducedMotion);
+  const [firstLoaded, setFirstLoaded] = useState(false);
+  const [{ active, previous }, setSlide] = useState<{ active: number; previous: number | null }>({
+    active: 0,
+    previous: null,
+  });
+  const wordmarkRef = useIrisLight();
+  const whatsapp = whatsappUrl("Hola, quiero cotizar una sesión con Iridiscencia.");
+
+  // Si la foto tarda, el diafragma no espera para siempre.
   useEffect(() => {
-    if (active) videoRef.current?.play();
-  }, [active, videoRef]);
+    const timeout = window.setTimeout(() => setFirstLoaded(true), 2500);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (!open || fotos.length < 2 || prefersReducedMotion()) return;
+    const interval = window.setInterval(() => {
+      setSlide(({ active }) => ({ active: (active + 1) % fotos.length, previous: active }));
+    }, SLIDE_MS);
+    return () => window.clearInterval(interval);
+  }, [open]);
 
   return (
-    <section id="inicio" className="relative flex min-h-screen items-center overflow-hidden">
-      <video
-        ref={videoRef}
-        src={HERO_VIDEO_URL}
-        muted
-        playsInline
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+    <section
+      id="inicio"
+      data-open={open}
+      className="group relative flex min-h-svh flex-col justify-end overflow-hidden bg-background"
+    >
+      {fotos.map((foto, i) => {
+        const shown = i === active;
+        // Solo se cargan la actual y la siguiente.
+        if (!shown && i !== previous && i !== (active + 1) % fotos.length) return null;
+        return (
+          <img
+            key={foto.src}
+            src={`${foto.src}${srcSet(foto.src) ? "&w=1920" : ""}`}
+            srcSet={srcSet(foto.src)}
+            sizes="100vw"
+            alt={shown ? foto.alt : ""}
+            aria-hidden={!shown}
+            fetchPriority={i === 0 ? "high" : "low"}
+            onLoad={i === 0 ? () => setFirstLoaded(true) : undefined}
+            className={`hero-foto absolute inset-0 h-full w-full object-cover ${shown ? "is-active" : ""} ${
+              shown || i === previous ? "is-drifting" : ""
+            }`}
+            style={{ objectPosition: foto.foco ?? "50% 50%" }}
+          />
+        );
+      })}
 
-      <div className="relative z-10 mx-auto max-w-4xl px-6 py-32 text-center [text-shadow:0_2px_20px_rgb(0_0_0_/_0.5)]">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-xs tracking-[0.25em] text-white/80 uppercase"
-        >
-          {siteConfig.ubicacion.split(",")[0]} / Portafolio &apos;26
-        </motion.p>
+      <div aria-hidden className="absolute inset-x-0 top-0 z-10 h-40 bg-gradient-to-b from-background/70 to-transparent" />
+      <div aria-hidden className="absolute inset-x-0 bottom-0 z-10 h-3/4 bg-gradient-to-t from-background via-background/60 to-transparent" />
 
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="mt-6 font-display text-6xl italic text-white sm:text-8xl"
+      {!prefersReducedMotion() && <ApertureIntro ready={firstLoaded} onOpen={() => setOpen(true)} />}
+
+      <div className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-12 sm:px-8 sm:pb-16">
+        <h1
+          ref={wordmarkRef}
+          className="iris-wordmark hero-reveal -ml-[0.04em] text-[clamp(3.5rem,15vw,13rem)] leading-[0.9] tracking-[-0.02em]"
         >
           {siteConfig.nombre}
-        </motion.h1>
+        </h1>
 
-        <div className="mt-4 h-8 text-lg text-white/85 sm:text-xl">
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={servicios[index]}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.35 }}
-              className="inline-block"
+        <div className="hero-reveal mt-8 flex flex-col gap-8 [transition-delay:150ms] sm:flex-row sm:items-end sm:justify-between">
+          <p className="max-w-md text-lg leading-relaxed text-foreground/85">{siteConfig.descripcion}</p>
+
+          <div className="flex flex-wrap gap-3">
+            <a
+              href={cotizarHref()}
+              target={whatsapp ? "_blank" : undefined}
+              rel={whatsapp ? "noopener" : undefined}
+              className="inline-flex h-12 items-center rounded-full bg-foreground px-6 font-medium text-background transition-colors hover:bg-foreground/85"
             >
-              {servicios[index]}
-            </motion.span>
-          </AnimatePresence>
+              {whatsapp ? "Cotizar por WhatsApp" : "Pedir cotización"}
+            </a>
+            <a
+              href="#trabajo"
+              className="inline-flex h-12 items-center rounded-full border border-foreground/30 px-6 font-medium text-foreground transition-colors hover:bg-foreground/10"
+            >
+              Ver fotos
+            </a>
+          </div>
         </div>
-
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="mx-auto mt-6 max-w-xl text-white/75"
-        >
-          {siteConfig.descripcion}
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="mt-10 flex justify-center gap-4"
-        >
-          <a href="#proyectos">
-            <Button size="lg">Ver Proyectos</Button>
-          </a>
-          <a href="#contacto">
-            <Button size="lg" variant="outline" className="border-white/30 bg-transparent text-white hover:bg-white/10">
-              Agendar Sesión
-            </Button>
-          </a>
-        </motion.div>
       </div>
     </section>
   );

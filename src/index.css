@@ -31,87 +31,140 @@
 
 :root {
   color-scheme: dark;
-  --font-sans: "Inter", sans-serif;
-  --font-display: "Instrument Serif", serif;
+  --font-sans: "Hanken Grotesk", system-ui, sans-serif;
+  --font-display: "Bodoni Moda", "Didot", serif;
 
-  /* Dark absoluto — tal como especifica el template */
-  --bg: 0 0% 4%;
-  --surface: 0 0% 8%;
-  --text: 0 0% 96%;
-  --muted-raw: 0 0% 53%;
-  --stroke: 0 0% 12%;
+  /* Cuarto oscuro: carbón cálido de fondo para que las fotos manden, texto
+     color papel. El color solo aparece en el espectro iridiscente del Hero. */
+  --carbon: #121110;
+  --surface: #1b1a18;
+  --paper: #eeeae4;
+  --muted-raw: #9a948b;
+  --line: #2b2926;
 
-  --background: hsl(var(--bg));
-  --foreground: hsl(var(--text));
-  --card: hsl(var(--surface));
-  --card-foreground: hsl(var(--text));
-  --popover: hsl(var(--surface));
-  --popover-foreground: hsl(var(--text));
-  --primary: hsl(var(--text));
-  --primary-foreground: hsl(var(--bg));
-  --secondary: hsl(var(--surface));
-  --secondary-foreground: hsl(var(--text));
-  --muted: hsl(var(--surface));
-  --muted-foreground: hsl(var(--muted-raw));
-  --accent: hsl(var(--surface));
-  --accent-foreground: hsl(var(--text));
-  --destructive: hsl(0 84% 60%);
-  --border: hsl(var(--stroke));
-  --input: hsl(var(--stroke));
-  --ring: #4e85bf;
-  --radius: 0.75rem;
+  /* Espectro de película fina (lente con recubrimiento, pompa de jabón) */
+  --iris-violeta: #b7a6ff;
+  --iris-agua: #7fdccb;
+  --iris-cobre: #efc58c;
+  --iris-rosa: #f2a0c4;
 
-  /* Acento de marca del template — gradiente azul de dos tonos */
-  --accent-gradient-start: #89aacc;
-  --accent-gradient-end: #4e85bf;
+  --background: var(--carbon);
+  --foreground: var(--paper);
+  --card: var(--surface);
+  --card-foreground: var(--paper);
+  --popover: var(--surface);
+  --popover-foreground: var(--paper);
+  --primary: var(--paper);
+  --primary-foreground: var(--carbon);
+  --secondary: var(--surface);
+  --secondary-foreground: var(--paper);
+  --muted: var(--surface);
+  --muted-foreground: var(--muted-raw);
+  --accent: var(--surface);
+  --accent-foreground: var(--paper);
+  --destructive: #f08a7e;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--paper);
+  --radius: 0.25rem;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
+    @apply border-border;
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--paper);
+    outline-offset: 3px;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-optical-sizing: auto;
+    text-wrap: balance;
   }
 }
 
-@utility accent-gradient {
-  background: linear-gradient(90deg, var(--accent-gradient-start) 0%, var(--accent-gradient-end) 100%);
-}
-
-.accent-gradient-text {
-  background: linear-gradient(90deg, var(--accent-gradient-start) 0%, var(--accent-gradient-end) 100%);
+/* Nombre del Hero: el color papel se abre en el espectro alrededor del puntero
+   (o de un punto que deriva solo en pantallas táctiles). La capa de arriba es
+   papel con un "agujero" radial; debajo está el espectro. */
+.iris-wordmark {
+  --x: 30%;
+  --y: 55%;
+  --angle: 120deg;
+  background-image:
+    radial-gradient(
+      circle at var(--x) var(--y),
+      transparent 0,
+      transparent 9%,
+      color-mix(in srgb, var(--paper) 55%, transparent) 17%,
+      var(--paper) 26%
+    ),
+    linear-gradient(
+      var(--angle),
+      var(--iris-violeta),
+      var(--iris-agua),
+      var(--iris-cobre),
+      var(--iris-rosa),
+      var(--iris-violeta)
+    );
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  filter: drop-shadow(0 2px 24px rgb(0 0 0 / 0.45));
 }
 
-@keyframes marquee {
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Hero: fotos que se alternan con fundido y un acercamiento lento */
+.hero-foto {
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+.hero-foto.is-active {
+  opacity: 1;
+}
+.hero-foto.is-drifting {
+  animation: hero-drift 9s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+}
+@keyframes hero-drift {
   from {
-    transform: translateX(0);
+    transform: scale(1.08);
   }
   to {
-    transform: translateX(-50%);
+    transform: scale(1);
   }
 }
 
-.animate-marquee {
-  animation: marquee 30s linear infinite;
+/* El texto del Hero aparece cuando termina de abrirse el diafragma */
+.hero-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.9s ease,
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
-}
-
-.animate-blink {
-  animation: blink 1.8s ease-in-out infinite;
+[data-open="true"] .hero-reveal {
+  opacity: 1;
+  transform: none;
 }

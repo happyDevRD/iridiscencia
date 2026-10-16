@@ -18,11 +18,21 @@ collections:
           - { label: "Eslogan", name: "eslogan", widget: "string" }
           - { label: "Ubicación", name: "ubicacion", widget: "string" }
           - { label: "Descripción", name: "descripcion", widget: "text" }
+          - label: "Fotos de portada"
+            name: "heroFotos"
+            widget: "list"
+            hint: "Fotos horizontales en alta resolución (mínimo 2400px de ancho). Se alternan en la portada."
+            summary: "{{alt}}"
+            fields:
+              - { label: "Foto", name: "src", widget: "image" }
+              - { label: "Descripción (para accesibilidad)", name: "alt", widget: "string" }
+              - { label: "Punto de interés (ej. 50% 40%)", name: "foco", widget: "string", default: "50% 50%", required: false }
           - label: "Contacto"
             name: "contacto"
             widget: "object"
             fields:
               - { label: "Email", name: "email", widget: "string" }
+              - { label: "WhatsApp (con código de país, ej. 18095551234)", name: "whatsapp", widget: "string", required: false }
               - { label: "Teléfono", name: "telefono", widget: "string", required: false }
               - { label: "Instagram", name: "instagram", widget: "string", required: false }
               - { label: "Dirección", name: "direccion", widget: "string", required: false }

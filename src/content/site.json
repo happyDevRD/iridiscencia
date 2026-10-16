@@ -2,11 +2,34 @@
   "nombre": "Iridiscencia",
   "eslogan": "Fotografía que captura lo irrepetible",
   "ubicacion": "San Pedro de Macorís, República Dominicana",
-  "descripcion": "Estudio de fotografía profesional — bodas, XV años, eventos corporativos y retratos.",
+  "descripcion": "Fotografía de bodas, XV años, eventos corporativos y retratos en San Pedro de Macorís.",
   "contacto": {
     "email": "contacto@iridiscencia.com",
+    "whatsapp": "",
     "telefono": "",
     "instagram": "",
     "direccion": ""
-  }
+  },
+  "heroFotos": [
+    {
+      "src": "https://images.unsplash.com/photo-1604017011826-d3b4c23f8914?q=82&auto=format&fit=crop",
+      "alt": "Pareja de novios abrazados en una colina al atardecer",
+      "foco": "58% 50%"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=82&auto=format&fit=crop",
+      "alt": "Novios tomados de la mano, con sus sombras sobre la grama",
+      "foco": "62% 40%"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1640827013600-1f5411ec366b?q=82&auto=format&fit=crop",
+      "alt": "Quinceañera con vestido bordado y ramo de flores",
+      "foco": "35% 40%"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1573676048035-9c2a72b6a12a?q=82&auto=format&fit=crop",
+      "alt": "Pareja caminando por una colina con montañas al fondo",
+      "foco": "52% 70%"
+    }
+  ]
 }
