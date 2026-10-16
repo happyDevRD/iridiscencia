@@ -1,0 +1,41 @@
+CÓMO PUBLICAR FOTOS EN LA WEB (iridiscencia.com)
+================================================
+
+Todo lo que pongas en estas carpetas aparece en la web solo, en un par
+de minutos. No hace falta avisar a nadie ni tocar nada más.
+
+CARPETAS
+--------
+  00 Portada            Las fotos grandes del inicio de la web (se van
+                        turnando). Pon de 3 a 6, las mejores, y mejor
+                        horizontales.
+  01 Bodas
+  02 Pre-boda
+  03 XV Años
+  04 Maternidad
+  05 Graduaciones
+  06 Cumpleaños
+  07 Niños y bebés
+  08 Eventos corporativos
+  09 Retratos
+  _Sin publicar         Para dejar fotos guardadas que todavía NO deben
+                        salir en la web. Nada de aquí se publica.
+
+REGLAS
+------
+  1. Cada foto va DENTRO de una carpeta. Las fotos sueltas aquí, en la
+     carpeta principal, no se publican.
+  2. Solo fotos JPG o PNG ya editadas y con la marca de agua. No subas
+     los RAW ni fotos sin editar.
+  3. Antes de publicar fotos de clientes, confirma que dieron permiso.
+  4. No uses logos o marcas de otras empresas (revistas, etc.).
+  5. Las fotos salen en orden alfabético por nombre de archivo. Para
+     que una salga primero, ponle un número delante: "01 novios.jpg".
+  6. Para quitar una foto de la web, bórrala o muévela a "_Sin publicar".
+  7. Una carpeta vacía no aparece en la web. Puedes crear categorías
+     nuevas con el mismo formato: número, espacio y nombre
+     ("10 Bautizos"). El número solo sirve para ordenar.
+  8. No toques las carpetas "_thumbs" ni "_web" ni el archivo
+     "manifest.json": se generan solos.
+
+Dudas: pregunta a soporte técnico antes de borrar o renombrar carpetas.

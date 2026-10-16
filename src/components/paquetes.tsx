@@ -2,6 +2,24 @@ import { useEffect, useState } from "react";
 import paquetesData from "@/content/paquetes.json";
 import { type Catalogo, fetchCatalogo, formatoPrecio, productosPorPrefijo } from "@/lib/catalogo";
 import { COTIZAR_EVENT, whatsappUrl } from "@/lib/contact";
+import { fetchGalleryManifest, type GalleryManifest } from "@/lib/gallery";
+
+/** Primera foto de la carpeta del NAS que corresponde al paquete; si no hay, la del CMS. */
+function imagenDe(paquete: { galeria?: string; imagen?: string }, galeria: GalleryManifest | null): string {
+  const categoria = galeria?.categorias.find((c) => c.id === paquete.galeria);
+  return categoria?.fotos[0]?.thumb ?? paquete.imagen ?? "";
+}
+
+/** Sin foto, un mosaico tipográfico en vez de un hueco gris. */
+function Mosaico({ numero }: { numero: number }) {
+  return (
+    <div aria-hidden className="paquete-mosaico flex h-full w-full items-end p-5">
+      <span className="font-display text-7xl leading-none text-foreground/90 tabular-nums">
+        {String(numero).padStart(2, "0")}
+      </span>
+    </div>
+  );
+}
 
 function precio(precioDesde: string) {
   const p = precioDesde.trim();
@@ -12,10 +30,14 @@ export function Paquetes() {
   // Los combos y precios salen de ProStock; si el catálogo no carga, cada
   // paquete se muestra igual que antes, con el texto del CMS.
   const [catalogo, setCatalogo] = useState<Catalogo | null>(null);
+  const [galeria, setGaleria] = useState<GalleryManifest | null>(null);
   useEffect(() => {
     let vivo = true;
     fetchCatalogo().then((c) => {
       if (vivo) setCatalogo(c);
+    });
+    fetchGalleryManifest().then((g) => {
+      if (vivo) setGaleria(g);
     });
     return () => {
       vivo = false;
@@ -34,14 +56,17 @@ export function Paquetes() {
         </div>
 
         <ul className="mt-14 divide-y divide-border border-y border-border">
-          {paquetesData.paquetes.map((paquete) => {
+          {paquetesData.paquetes.map((paquete, i) => {
+            const imagen = imagenDe(paquete, galeria);
             const combos = productosPorPrefijo(catalogo, paquete.prefijosSku ?? []);
             const wa = whatsappUrl(`Hola, quiero cotizar el paquete de ${paquete.nombre}.`);
             return (
               <li key={paquete.id} className="grid gap-6 py-8 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
                 <div className="aspect-[3/2] overflow-hidden rounded-sm bg-card">
-                  {paquete.imagen && (
-                    <img src={paquete.imagen} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                  {imagen ? (
+                    <img src={imagen} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                  ) : (
+                    <Mosaico numero={i + 1} />
                   )}
                 </div>
                 <div className="flex flex-col justify-between gap-6">

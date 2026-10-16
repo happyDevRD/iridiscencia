@@ -20,7 +20,8 @@ services:
     restart: unless-stopped
     volumes:
       - /volume1/Galeria:/galeria
-    mem_limit: 48m
+    # Tope, no reserva: en reposo gasta unos MB; al reducir un JPEG progresivo de ~13 MP llega a ~120 MB.
+    mem_limit: 160m
 
 networks:
   web:

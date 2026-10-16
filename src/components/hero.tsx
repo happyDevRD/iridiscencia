@@ -2,9 +2,37 @@ import { useEffect, useRef, useState } from "react";
 import siteConfig from "@/content/site.json";
 import { ApertureIntro } from "@/components/aperture-intro";
 import { cotizarHref, whatsappUrl } from "@/lib/contact";
+import { fetchGalleryManifest } from "@/lib/gallery";
 
 const SLIDE_MS = 7000;
-const fotos = siteConfig.heroFotos;
+/** Lo que se espera al manifest del NAS antes de caer en las fotos de site.json. */
+const MANIFEST_WAIT_MS = 1500;
+
+type HeroFoto = { src: string; alt: string; foco?: string };
+
+/** Fotos de "00 Portada" en el NAS; si no hay, las de site.json. */
+function useHeroFotos(): HeroFoto[] | null {
+  const [fotos, setFotos] = useState<HeroFoto[] | null>(null);
+
+  useEffect(() => {
+    let done = false;
+    const fallback = () => {
+      if (!done) setFotos(siteConfig.heroFotos);
+      done = true;
+    };
+    const timeout = window.setTimeout(fallback, MANIFEST_WAIT_MS);
+    fetchGalleryManifest().then((manifest) => {
+      if (done) return;
+      const portada = manifest?.portada ?? [];
+      if (portada.length === 0) return fallback();
+      done = true;
+      setFotos(portada.map((f) => ({ src: f.src, alt: `Fotografía de ${siteConfig.nombre}`, foco: "50% 35%" })));
+    });
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  return fotos;
+}
 
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -60,6 +88,7 @@ export function Hero() {
     previous: null,
   });
   const wordmarkRef = useIrisLight();
+  const fotos = useHeroFotos() ?? [];
   const whatsapp = whatsappUrl("Hola, quiero cotizar una sesión con Iridiscencia.");
 
   // Si la foto tarda, el diafragma no espera para siempre.
@@ -74,7 +103,7 @@ export function Hero() {
       setSlide(({ active }) => ({ active: (active + 1) % fotos.length, previous: active }));
     }, SLIDE_MS);
     return () => window.clearInterval(interval);
-  }, [open]);
+  }, [open, fotos.length]);
 
   return (
     <section
@@ -112,7 +141,7 @@ export function Hero() {
       <div className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-12 sm:px-8 sm:pb-16">
         <h1
           ref={wordmarkRef}
-          className="iris-wordmark hero-reveal -ml-[0.04em] text-[clamp(3.5rem,15vw,13rem)] leading-[0.9] tracking-[-0.02em]"
+          className="iris-wordmark hero-reveal -ml-[0.04em] pr-[0.06em] text-[clamp(2.5rem,15vw,13rem)] leading-[0.9] tracking-[-0.02em]"
         >
           {siteConfig.nombre}
         </h1>

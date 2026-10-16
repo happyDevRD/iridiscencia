@@ -15,6 +15,7 @@ function fotosDe(ids: string[]) {
 }
 
 export const demoGalleryManifest: GalleryManifest = {
+  portada: [],
   categorias: [
     {
       id: "bodas",

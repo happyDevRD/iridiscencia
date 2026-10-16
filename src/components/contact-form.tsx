@@ -1,11 +1,34 @@
 import { useEffect, useId, useRef, useState } from "react";
 import paquetesData from "@/content/paquetes.json";
 import siteConfig from "@/content/site.json";
-import { COTIZAR_EVENT } from "@/lib/contact";
+import { COTIZAR_EVENT, whatsappUrl } from "@/lib/contact";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 type Status = "idle" | "sending" | "sent" | "error";
+
+const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY ?? "";
+
+/** Sin Web3Forms configurado, la cotización sale redactada por WhatsApp o, en último caso, por correo. */
+function enviarSinBackend(data: FormData): void {
+  const campo = (k: string) => String(data.get(k) ?? "").trim();
+  const texto = [
+    `Hola, soy ${campo("nombre")}. Quiero cotizar: ${campo("tipo_evento")}.`,
+    campo("fecha") && `Fecha: ${campo("fecha")}.`,
+    campo("mensaje"),
+    `Mi teléfono: ${campo("telefono")}${campo("email") ? ` · ${campo("email")}` : ""}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const whatsapp = whatsappUrl(texto);
+  if (whatsapp) {
+    window.open(whatsapp, "_blank", "noopener");
+  } else {
+    const asunto = `Cotización: ${campo("tipo_evento")}`;
+    window.location.href = `mailto:${siteConfig.contacto.email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`;
+  }
+}
 
 const TIPOS = [...paquetesData.paquetes.map((p) => p.nombre), "Otro"];
 
@@ -42,7 +65,14 @@ export function ContactForm() {
     setStatus("sending");
 
     const formData = new FormData(form);
-    formData.append("access_key", import.meta.env.VITE_WEB3FORMS_KEY ?? "");
+    if (!WEB3FORMS_KEY) {
+      enviarSinBackend(formData);
+      form.reset();
+      setTipo("");
+      setStatus("sent");
+      return;
+    }
+    formData.append("access_key", WEB3FORMS_KEY);
     formData.append("subject", `Nueva cotización (${formData.get("tipo_evento") || "sin tipo"}) — ${siteConfig.nombre}`);
     formData.append("from_name", "Web de Iridiscencia");
 
@@ -61,8 +91,12 @@ export function ContactForm() {
   if (status === "sent") {
     return (
       <div className="border-t border-border pt-8" role="status">
-        <p className="font-display text-3xl">Mensaje enviado.</p>
-        <p className="mt-3 text-muted-foreground">Te escribimos al número que dejaste con la cotización.</p>
+        <p className="font-display text-3xl">{WEB3FORMS_KEY ? "Mensaje enviado." : "Ya casi."}</p>
+        <p className="mt-3 text-muted-foreground">
+          {WEB3FORMS_KEY
+            ? "Te escribimos al número que dejaste con la cotización."
+            : "Abrimos tu mensaje ya redactado: solo falta pulsar enviar. Te respondemos con la cotización."}
+        </p>
         <button type="button" onClick={() => setStatus("idle")} className="mt-6 text-sm underline underline-offset-4">
           Enviar otro mensaje
         </button>

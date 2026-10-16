@@ -5,7 +5,10 @@
       "nombre": "Bodas",
       "descripcion": "Cobertura completa de tu boda, desde los preparativos hasta la fiesta.",
       "precioDesde": "Consultar",
-      "prefijosSku": ["SES-BOD"],
+      "prefijosSku": [
+        "SES-BOD"
+      ],
+      "galeria": "bodas",
       "imagen": "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&q=80&auto=format&fit=crop"
     },
     {
@@ -13,7 +16,10 @@
       "nombre": "Pre-boda",
       "descripcion": "Sesión de pareja antes de la boda.",
       "precioDesde": "Consultar",
-      "prefijosSku": ["SES-PRB"],
+      "prefijosSku": [
+        "SES-PRB"
+      ],
+      "galeria": "pre-boda",
       "imagen": ""
     },
     {
@@ -21,7 +27,10 @@
       "nombre": "XV Años",
       "descripcion": "Sesión de estudio + cobertura de la celebración.",
       "precioDesde": "Consultar",
-      "prefijosSku": ["SES-XV"],
+      "prefijosSku": [
+        "SES-XV"
+      ],
+      "galeria": "xv-anos",
       "imagen": "https://images.unsplash.com/photo-1714611302520-5afa2c3e26df?w=800&q=80&auto=format&fit=crop"
     },
     {
@@ -29,7 +38,10 @@
       "nombre": "Graduación universitaria",
       "descripcion": "Fotos de graduación con foto enmarcada y llaveros incluidos.",
       "precioDesde": "Consultar",
-      "prefijosSku": ["SES-GRA"],
+      "prefijosSku": [
+        "SES-GRA"
+      ],
+      "galeria": "graduaciones",
       "imagen": ""
     },
     {
@@ -37,7 +49,10 @@
       "nombre": "Bachiller",
       "descripcion": "Sesión de graduación de bachillerato.",
       "precioDesde": "Consultar",
-      "prefijosSku": ["SES-BAC"],
+      "prefijosSku": [
+        "SES-BAC"
+      ],
+      "galeria": "graduaciones",
       "imagen": ""
     },
     {
@@ -45,7 +60,10 @@
       "nombre": "Cumpleaños",
       "descripcion": "Sesión de estudio para celebrar tu cumpleaños.",
       "precioDesde": "Consultar",
-      "prefijosSku": ["SES-CUM"],
+      "prefijosSku": [
+        "SES-CUM"
+      ],
+      "galeria": "cumpleanos",
       "imagen": ""
     },
     {
@@ -53,7 +71,10 @@
       "nombre": "Niños y bebés",
       "descripcion": "Sesión de estudio para los más pequeños de la casa.",
       "precioDesde": "Consultar",
-      "prefijosSku": ["SES-BEB"],
+      "prefijosSku": [
+        "SES-BEB"
+      ],
+      "galeria": "ninos-y-bebes",
       "imagen": ""
     },
     {
@@ -62,6 +83,7 @@
       "descripcion": "Retratos de equipo, eventos empresariales y cobertura institucional.",
       "precioDesde": "Consultar",
       "prefijosSku": [],
+      "galeria": "eventos-corporativos",
       "imagen": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80&auto=format&fit=crop"
     },
     {
@@ -70,6 +92,7 @@
       "descripcion": "Sesión de estudio o exteriores, individual o familiar.",
       "precioDesde": "Consultar",
       "prefijosSku": [],
+      "galeria": "retratos",
       "imagen": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80&auto=format&fit=crop"
     }
   ]

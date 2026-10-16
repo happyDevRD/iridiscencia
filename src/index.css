@@ -168,3 +168,17 @@
   opacity: 1;
   transform: none;
 }
+
+/* Paquete sin foto: brillo iridiscente apagado, distinto en cada fila. */
+.paquete-mosaico {
+  background:
+    radial-gradient(120% 90% at 85% 110%, color-mix(in oklab, var(--iris-violeta) 22%, transparent), transparent 60%),
+    radial-gradient(90% 80% at 10% -10%, color-mix(in oklab, var(--iris-agua) 16%, transparent), transparent 55%),
+    var(--card);
+}
+li:nth-child(even) .paquete-mosaico {
+  background:
+    radial-gradient(120% 90% at 15% 110%, color-mix(in oklab, var(--iris-cobre) 20%, transparent), transparent 60%),
+    radial-gradient(90% 80% at 90% -10%, color-mix(in oklab, var(--iris-rosa) 16%, transparent), transparent 55%),
+    var(--card);
+}

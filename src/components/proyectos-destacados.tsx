@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchGalleryManifest, type GalleryManifest } from "@/lib/gallery";
+import { fetchGalleryManifest, type GalleryManifest, type GalleryPhoto } from "@/lib/gallery";
 import { cotizarHref } from "@/lib/contact";
 import { Lightbox, type LightboxPhoto } from "@/components/lightbox";
 
 const PAGE_SIZE = 12;
 
-type Foto = LightboxPhoto & { thumb: string };
+type Foto = LightboxPhoto & GalleryPhoto;
 
 function Skeleton() {
   return (
@@ -108,9 +108,11 @@ export function ProyectosDestacados() {
                       <img
                         src={foto.thumb}
                         alt={foto.alt}
+                        width={foto.w || undefined}
+                        height={foto.h || undefined}
                         loading={i < 3 ? "eager" : "lazy"}
                         decoding="async"
-                        className="w-full transition-transform duration-500 group-hover:scale-[1.02]"
+                        className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.02]"
                       />
                     </button>
                   </li>
