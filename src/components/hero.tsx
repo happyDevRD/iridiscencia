@@ -1,172 +1,148 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowDown } from "lucide-react";
 import siteConfig from "@/content/site.json";
-import { ApertureIntro } from "@/components/aperture-intro";
 import { cotizarHref, whatsappUrl } from "@/lib/contact";
-import { fetchGalleryManifest } from "@/lib/gallery";
+import { useGaleria, type GalleryManifest } from "@/lib/gallery";
+import { Lightbox, type LightboxPhoto } from "@/components/lightbox";
+import { Fotograma, FotogramaVacio, Tira, Trazo } from "@/components/pelicula";
 
-const SLIDE_MS = 7000;
-/** Lo que se espera al manifest del NAS antes de caer en las fotos de site.json. */
-const MANIFEST_WAIT_MS = 1500;
+/** Una tira corta se completa con fotogramas sin exponer hasta este mínimo. */
+const MIN_FOTOGRAMAS = 8;
+const MAX_FOTOGRAMAS = 10;
 
-type HeroFoto = { src: string; alt: string; foco?: string };
+type FotoHero = LightboxPhoto & { thumb: string; w?: number; h?: number };
 
-/** Fotos de "00 Portada" en el NAS; si no hay, las de site.json. */
-function useHeroFotos(): HeroFoto[] | null {
-  const [fotos, setFotos] = useState<HeroFoto[] | null>(null);
+/** Portada del NAS; si está vacía, lo más reciente de la galería; si no hay galería, site.json. */
+function fotosDelHero(manifest: GalleryManifest | null | undefined): FotoHero[] {
+  if (manifest === undefined) return [];
+  const portada = (manifest?.portada ?? []).map((f) => ({
+    ...f,
+    alt: `Fotografía de ${siteConfig.nombre}`,
+    caption: "Portada",
+  }));
+  if (portada.length > 0) return portada.slice(0, MAX_FOTOGRAMAS);
 
-  useEffect(() => {
-    let done = false;
-    const fallback = () => {
-      if (!done) setFotos(siteConfig.heroFotos);
-      done = true;
-    };
-    const timeout = window.setTimeout(fallback, MANIFEST_WAIT_MS);
-    fetchGalleryManifest().then((manifest) => {
-      if (done) return;
-      const portada = manifest?.portada ?? [];
-      if (portada.length === 0) return fallback();
-      done = true;
-      setFotos(portada.map((f) => ({ src: f.src, alt: `Fotografía de ${siteConfig.nombre}`, foco: "50% 35%" })));
-    });
-    return () => window.clearTimeout(timeout);
-  }, []);
+  const galeria = (manifest?.categorias ?? []).flatMap((c) =>
+    c.fotos.map((f) => ({ ...f, alt: `${c.nombre} — ${siteConfig.nombre}`, caption: c.nombre }))
+  );
+  if (galeria.length > 0) return galeria.slice(0, MAX_FOTOGRAMAS);
 
-  return fotos;
-}
-
-const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-/** Para fotos de Unsplash (placeholders) pide el ancho justo; las propias se sirven tal cual. */
-function srcSet(src: string) {
-  if (!src.includes("images.unsplash.com")) return undefined;
-  return [1280, 1920, 2560, 3200].map((w) => `${src}&w=${w} ${w}w`).join(", ");
-}
-
-/**
- * Mueve el "punto de luz" del nombre: sigue al puntero en escritorio y deriva
- * despacio por sí solo en táctil. Con reduced motion queda fijo.
- */
-function useIrisLight() {
-  const ref = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || prefersReducedMotion()) return;
-
-    function set(xPct: number, yPct: number) {
-      el!.style.setProperty("--x", `${xPct}%`);
-      el!.style.setProperty("--y", `${yPct}%`);
-      el!.style.setProperty("--angle", `${90 + xPct * 1.8}deg`);
-    }
-
-    if (window.matchMedia("(hover: hover)").matches) {
-      function handleMove(e: PointerEvent) {
-        const r = el!.getBoundingClientRect();
-        set(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
-      }
-      window.addEventListener("pointermove", handleMove);
-      return () => window.removeEventListener("pointermove", handleMove);
-    }
-
-    let frame: number;
-    function drift(t: number) {
-      set(50 + Math.sin(t / 2600) * 42, 50 + Math.cos(t / 1900) * 30);
-      frame = requestAnimationFrame(drift);
-    }
-    frame = requestAnimationFrame(drift);
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  return ref;
+  return siteConfig.heroFotos.map((f) => ({
+    src: `${f.src}&w=2000`,
+    thumb: `${f.src}&w=700`,
+    alt: f.alt,
+    caption: siteConfig.nombre,
+  }));
 }
 
 export function Hero() {
-  const [open, setOpen] = useState(prefersReducedMotion);
-  const [firstLoaded, setFirstLoaded] = useState(false);
-  const [{ active, previous }, setSlide] = useState<{ active: number; previous: number | null }>({
-    active: 0,
-    previous: null,
-  });
-  const wordmarkRef = useIrisLight();
-  const fotos = useHeroFotos() ?? [];
+  const manifest = useGaleria();
+  const fotos = useMemo(() => fotosDelHero(manifest), [manifest]);
+  const elegida = fotos.length > 1 ? 1 : 0;
+  const [subrayado, setSubrayado] = useState(false);
+  const [marcada, setMarcada] = useState(false);
+  const [visor, setVisor] = useState<number | null>(null);
   const whatsapp = whatsappUrl("Hola, quiero cotizar una sesión con Iridiscencia.");
 
-  // Si la foto tarda, el diafragma no espera para siempre.
+  // Primero se marca la frase y, cuando la tira ya se reveló, la foto elegida.
   useEffect(() => {
-    const timeout = window.setTimeout(() => setFirstLoaded(true), 2500);
-    return () => window.clearTimeout(timeout);
+    const t = window.setTimeout(() => setSubrayado(true), 500);
+    return () => window.clearTimeout(t);
   }, []);
-
   useEffect(() => {
-    if (!open || fotos.length < 2 || prefersReducedMotion()) return;
-    const interval = window.setInterval(() => {
-      setSlide(({ active }) => ({ active: (active + 1) % fotos.length, previous: active }));
-    }, SLIDE_MS);
-    return () => window.clearInterval(interval);
-  }, [open, fotos.length]);
+    if (fotos.length === 0) return;
+    const t = window.setTimeout(() => setMarcada(true), 1500 + elegida * 120);
+    return () => window.clearTimeout(t);
+  }, [fotos.length, elegida]);
+
+  const vacios = Math.max(0, MIN_FOTOGRAMAS - fotos.length);
 
   return (
-    <section
-      id="inicio"
-      data-open={open}
-      className="group relative flex min-h-svh flex-col justify-end overflow-hidden bg-background"
-    >
-      {fotos.map((foto, i) => {
-        const shown = i === active;
-        // Solo se cargan la actual y la siguiente.
-        if (!shown && i !== previous && i !== (active + 1) % fotos.length) return null;
-        return (
-          <img
-            key={foto.src}
-            src={`${foto.src}${srcSet(foto.src) ? "&w=1920" : ""}`}
-            srcSet={srcSet(foto.src)}
-            sizes="100vw"
-            alt={shown ? foto.alt : ""}
-            aria-hidden={!shown}
-            fetchPriority={i === 0 ? "high" : "low"}
-            onLoad={i === 0 ? () => setFirstLoaded(true) : undefined}
-            className={`hero-foto absolute inset-0 h-full w-full object-cover ${shown ? "is-active" : ""} ${
-              shown || i === previous ? "is-drifting" : ""
-            }`}
-            style={{ objectPosition: foto.foco ?? "50% 50%" }}
-          />
-        );
-      })}
-
-      <div aria-hidden className="absolute inset-x-0 top-0 z-10 h-40 bg-gradient-to-b from-background/70 to-transparent" />
-      <div aria-hidden className="absolute inset-x-0 bottom-0 z-10 h-3/4 bg-gradient-to-t from-background via-background/60 to-transparent" />
-
-      {!prefersReducedMotion() && <ApertureIntro ready={firstLoaded} onOpen={() => setOpen(true)} />}
-
-      <div className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-12 sm:px-8 sm:pb-16">
-        <h1
-          ref={wordmarkRef}
-          className="iris-wordmark hero-reveal -ml-[0.04em] pr-[0.06em] text-[clamp(2.5rem,15vw,13rem)] leading-[0.9] tracking-[-0.02em]"
-        >
-          {siteConfig.nombre}
-        </h1>
-
-        <div className="hero-reveal mt-8 flex flex-col gap-8 [transition-delay:150ms] sm:flex-row sm:items-end sm:justify-between">
-          <p className="max-w-md text-lg leading-relaxed text-foreground/85">{siteConfig.descripcion}</p>
-
-          <div className="flex flex-wrap gap-3">
+    <section id="inicio" className="pt-16">
+      <div className="mx-auto grid max-w-7xl gap-12 px-5 pb-14 pt-12 sm:px-8 lg:grid-cols-12 lg:items-end lg:pb-20 lg:pt-20">
+        <div className="lg:col-span-7">
+          <p className="etiqueta text-muted-foreground">Estudio de fotografía · {siteConfig.ubicacion}</p>
+          <h1 className="mt-6 text-[clamp(2.75rem,7.2vw,6.5rem)] leading-[0.94]">
+            Fotografiamos lo que{" "}
+            <span className="relative inline-block whitespace-nowrap">
+              no se repite
+              <Trazo dibujado={subrayado} className="-inset-x-[5%] -inset-y-[16%] h-[132%] w-[110%]" />
+            </span>
+            .
+          </h1>
+          <p className="mt-8 max-w-md text-lg leading-relaxed text-muted-foreground">
+            Bodas, XV años, maternidad, graduaciones y retratos. En nuestro estudio o donde sea tu celebración.
+          </p>
+          <div className="mt-10 flex flex-wrap gap-3">
             <a
               href={cotizarHref()}
               target={whatsapp ? "_blank" : undefined}
               rel={whatsapp ? "noopener" : undefined}
-              className="inline-flex h-12 items-center rounded-full bg-foreground px-6 font-medium text-background transition-colors hover:bg-foreground/85"
+              className="inline-flex h-12 items-center rounded-sm bg-foreground px-6 font-medium text-background transition-colors hover:bg-foreground/85"
             >
               {whatsapp ? "Cotizar por WhatsApp" : "Pedir cotización"}
             </a>
             <a
               href="#trabajo"
-              className="inline-flex h-12 items-center rounded-full border border-foreground/30 px-6 font-medium text-foreground transition-colors hover:bg-foreground/10"
+              className="inline-flex h-12 items-center gap-2 rounded-sm border border-foreground/25 px-6 font-medium transition-colors hover:border-foreground"
             >
-              Ver fotos
+              Ver el trabajo
+              <ArrowDown className="size-4" aria-hidden />
             </a>
           </div>
         </div>
+
+        {fotos[elegida] && (
+          <figure className="hidden lg:col-span-4 lg:col-start-9 lg:block">
+            <div className="bg-card p-3 pb-14 shadow-[0_1px_2px_rgb(0_0_0/0.08),0_18px_40px_-18px_rgb(0_0_0/0.35)]">
+              <img
+                src={fotos[elegida].src}
+                alt={fotos[elegida].alt}
+                fetchPriority="high"
+                className="aspect-[4/5] w-full object-cover"
+              />
+            </div>
+            <figcaption className="-mt-11 pl-5 font-mano text-3xl text-lapiz [transform:rotate(-2deg)]">
+              ésta es la elegida
+            </figcaption>
+          </figure>
+        )}
       </div>
+
+      <Tira rotulo={`${siteConfig.nombre.toUpperCase()} FILM 400 · HOJA DE CONTACTOS`}>
+        <ul className="flex snap-x gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:px-8" aria-label="Fotos recientes">
+          {fotos.map((foto, i) => (
+            <li key={foto.src} className="w-[40vw] shrink-0 snap-start sm:w-[24vw] lg:w-[calc((100%-7*0.75rem)/8)]">
+              <button
+                type="button"
+                onClick={() => setVisor(i)}
+                aria-label={`Ver foto ${i + 1}: ${foto.caption}`}
+                className="group block w-full text-left"
+              >
+                <Fotograma
+                  src={foto.thumb}
+                  alt=""
+                  width={foto.w}
+                  height={foto.h}
+                  numero={i + 1}
+                  retardo={i * 120}
+                  marcado={i === elegida && marcada}
+                  eager={i < 4}
+                />
+              </button>
+            </li>
+          ))}
+          {Array.from({ length: vacios }, (_, i) => (
+            <li key={`vacio-${i}`} className="w-[40vw] shrink-0 sm:w-[24vw] lg:w-[calc((100%-7*0.75rem)/8)]">
+              <FotogramaVacio numero={fotos.length + i + 1} />
+            </li>
+          ))}
+        </ul>
+      </Tira>
+
+      {visor !== null && fotos[visor] && (
+        <Lightbox photos={fotos} index={visor} onChange={setVisor} onClose={() => setVisor(null)} />
+      )}
     </section>
   );
 }

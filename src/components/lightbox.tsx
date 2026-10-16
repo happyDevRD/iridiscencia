@@ -63,7 +63,7 @@ export function Lightbox({ photos, index, onChange, onClose }: Props) {
       role="dialog"
       aria-modal="true"
       aria-label="Visor de fotos"
-      className="fixed inset-0 z-[100] flex flex-col bg-background/97"
+      className="fixed inset-0 z-[100] flex flex-col bg-pelicula text-papel"
       onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
       onTouchEnd={(e) => {
         if (touchX.current === null) return;
@@ -72,11 +72,11 @@ export function Lightbox({ photos, index, onChange, onClose }: Props) {
         touchX.current = null;
       }}
     >
-      <div className="flex h-16 shrink-0 items-center justify-between px-5 text-sm text-muted-foreground sm:px-8">
+      <div className="flex h-16 shrink-0 items-center justify-between px-5 etiqueta text-velado sm:px-8">
         <span aria-live="polite">
           {photo.caption} <span className="tabular-nums">{index + 1} / {photos.length}</span>
         </span>
-        <button ref={closeRef} type="button" aria-label="Cerrar visor" onClick={onClose} className="-mr-2 p-2 text-foreground">
+        <button ref={closeRef} type="button" aria-label="Cerrar visor" onClick={onClose} className="-mr-2 p-2.5 text-papel">
           <X className="size-6" />
         </button>
       </div>
@@ -96,7 +96,7 @@ export function Lightbox({ photos, index, onChange, onClose }: Props) {
             e.stopPropagation();
             prev();
           }}
-          className="absolute left-2 hidden p-3 text-foreground/70 hover:text-foreground sm:block"
+          className="absolute left-2 hidden p-3 text-papel/70 hover:text-papel sm:block"
         >
           <ChevronLeft className="size-8" />
         </button>
@@ -107,7 +107,7 @@ export function Lightbox({ photos, index, onChange, onClose }: Props) {
             e.stopPropagation();
             next();
           }}
-          className="absolute right-2 hidden p-3 text-foreground/70 hover:text-foreground sm:block"
+          className="absolute right-2 hidden p-3 text-papel/70 hover:text-papel sm:block"
         >
           <ChevronRight className="size-8" />
         </button>

@@ -7,9 +7,7 @@
       "precioDesde": "Consultar",
       "prefijosSku": [
         "SES-BOD"
-      ],
-      "galeria": "bodas",
-      "imagen": "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&q=80&auto=format&fit=crop"
+      ]
     },
     {
       "id": "pre-boda",
@@ -18,9 +16,7 @@
       "precioDesde": "Consultar",
       "prefijosSku": [
         "SES-PRB"
-      ],
-      "galeria": "pre-boda",
-      "imagen": ""
+      ]
     },
     {
       "id": "xv-anos",
@@ -29,9 +25,7 @@
       "precioDesde": "Consultar",
       "prefijosSku": [
         "SES-XV"
-      ],
-      "galeria": "xv-anos",
-      "imagen": "https://images.unsplash.com/photo-1714611302520-5afa2c3e26df?w=800&q=80&auto=format&fit=crop"
+      ]
     },
     {
       "id": "graduacion",
@@ -40,9 +34,7 @@
       "precioDesde": "Consultar",
       "prefijosSku": [
         "SES-GRA"
-      ],
-      "galeria": "graduaciones",
-      "imagen": ""
+      ]
     },
     {
       "id": "bachiller",
@@ -51,9 +43,7 @@
       "precioDesde": "Consultar",
       "prefijosSku": [
         "SES-BAC"
-      ],
-      "galeria": "graduaciones",
-      "imagen": ""
+      ]
     },
     {
       "id": "cumpleanos",
@@ -62,9 +52,7 @@
       "precioDesde": "Consultar",
       "prefijosSku": [
         "SES-CUM"
-      ],
-      "galeria": "cumpleanos",
-      "imagen": ""
+      ]
     },
     {
       "id": "ninos-bebes",
@@ -73,27 +61,21 @@
       "precioDesde": "Consultar",
       "prefijosSku": [
         "SES-BEB"
-      ],
-      "galeria": "ninos-y-bebes",
-      "imagen": ""
+      ]
     },
     {
       "id": "corporativo",
       "nombre": "Corporativo",
       "descripcion": "Retratos de equipo, eventos empresariales y cobertura institucional.",
       "precioDesde": "Consultar",
-      "prefijosSku": [],
-      "galeria": "eventos-corporativos",
-      "imagen": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80&auto=format&fit=crop"
+      "prefijosSku": []
     },
     {
       "id": "retratos",
       "nombre": "Retratos",
       "descripcion": "Sesión de estudio o exteriores, individual o familiar.",
       "precioDesde": "Consultar",
-      "prefijosSku": [],
-      "galeria": "retratos",
-      "imagen": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80&auto=format&fit=crop"
+      "prefijosSku": []
     }
   ]
 }

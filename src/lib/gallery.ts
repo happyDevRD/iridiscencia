@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 export type GalleryPhoto = {
   /** Versión de ~2400 px para el visor y la portada. */
   src: string;
@@ -53,4 +55,19 @@ let pending: Promise<GalleryManifest | null> | null = null;
 export function fetchGalleryManifest(): Promise<GalleryManifest | null> {
   pending ??= load();
   return pending;
+}
+
+/** Manifest para componentes: `undefined` mientras carga, `null` si no hay galería. */
+export function useGaleria(): GalleryManifest | null | undefined {
+  const [manifest, setManifest] = useState<GalleryManifest | null | undefined>(undefined);
+  useEffect(() => {
+    let vivo = true;
+    fetchGalleryManifest().then((m) => {
+      if (vivo) setManifest(m);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, []);
+  return manifest;
 }

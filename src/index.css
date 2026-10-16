@@ -5,68 +5,54 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-serif: var(--font-display);
-  --font-display: var(--font-display);
+  --font-display: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-mano: var(--font-mano);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
+  --color-pelicula: var(--pelicula);
+  --color-ambar: var(--ambar);
+  --color-lapiz: var(--lapiz);
+  --color-papel: var(--papel);
+  --color-velado: var(--velado);
+  --color-sin-exponer: var(--sin-exponer);
+  --radius-sm: 2px;
+  --radius-lg: 4px;
 }
 
 :root {
-  color-scheme: dark;
-  --font-sans: "Hanken Grotesk", system-ui, sans-serif;
-  --font-display: "Bodoni Moda", "Didot", serif;
+  color-scheme: light;
+  --font-sans: "Archivo", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-mano: "Nanum Pen Script", "Comic Sans MS", cursive;
 
-  /* Cuarto oscuro: carbón cálido de fondo para que las fotos manden, texto
-     color papel. El color solo aparece en el espectro iridiscente del Hero. */
-  --carbon: #121110;
-  --surface: #1b1a18;
-  --paper: #eeeae4;
-  --muted-raw: #9a948b;
-  --line: #2b2926;
+  /* Hoja de contactos: papel baritado, copias blancas, tiras de película y el
+     lápiz graso rojo con que el fotógrafo marca las elegidas. */
+  --papel: #ecebe6;
+  --copia: #fafaf7;
+  --tinta: #18181b;
+  --grafito: #5c5b56;
+  --linea: #cfcec8;
+  --pelicula: #1d1b18;
+  --ambar: #e09a3e;
+  --lapiz: #d2261c;
+  --velado: #b9b7af; /* texto secundario sobre película */
+  --sin-exponer: #0e0d0b;
 
-  /* Espectro de película fina (lente con recubrimiento, pompa de jabón) */
-  --iris-violeta: #b7a6ff;
-  --iris-agua: #7fdccb;
-  --iris-cobre: #efc58c;
-  --iris-rosa: #f2a0c4;
-
-  --background: var(--carbon);
-  --foreground: var(--paper);
-  --card: var(--surface);
-  --card-foreground: var(--paper);
-  --popover: var(--surface);
-  --popover-foreground: var(--paper);
-  --primary: var(--paper);
-  --primary-foreground: var(--carbon);
-  --secondary: var(--surface);
-  --secondary-foreground: var(--paper);
-  --muted: var(--surface);
-  --muted-foreground: var(--muted-raw);
-  --accent: var(--surface);
-  --accent-foreground: var(--paper);
-  --destructive: #f08a7e;
-  --border: var(--line);
-  --input: var(--line);
-  --ring: var(--paper);
-  --radius: 0.25rem;
+  --background: var(--papel);
+  --foreground: var(--tinta);
+  --card: var(--copia);
+  --card-foreground: var(--tinta);
+  --muted-foreground: var(--grafito);
+  --destructive: var(--lapiz);
+  --border: var(--linea);
+  --input: var(--linea);
+  --ring: var(--tinta);
 }
 
 @layer base {
@@ -76,51 +62,117 @@
   html {
     @apply font-sans;
     scroll-behavior: smooth;
+    scroll-padding-top: 4.5rem;
   }
   body {
     @apply bg-background text-foreground antialiased;
   }
   :focus-visible {
-    outline: 2px solid var(--paper);
+    outline: 2px solid var(--tinta);
     outline-offset: 3px;
   }
   h1,
   h2,
   h3 {
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-optical-sizing: auto;
+    font-stretch: 72%;
+    font-weight: 600;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
 }
 
-/* Nombre del Hero: el color papel se abre en el espectro alrededor del puntero
-   (o de un punto que deriva solo en pantallas táctiles). La capa de arriba es
-   papel con un "agujero" radial; debajo está el espectro. */
-.iris-wordmark {
-  --x: 30%;
-  --y: 55%;
-  --angle: 120deg;
-  background-image:
-    radial-gradient(
-      circle at var(--x) var(--y),
-      transparent 0,
-      transparent 9%,
-      color-mix(in srgb, var(--paper) 55%, transparent) 17%,
-      var(--paper) 26%
-    ),
-    linear-gradient(
-      var(--angle),
-      var(--iris-violeta),
-      var(--iris-agua),
-      var(--iris-cobre),
-      var(--iris-rosa),
-      var(--iris-violeta)
-    );
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 2px 24px rgb(0 0 0 / 0.45));
+/* Etiquetas de laboratorio: mono, mayúsculas, espaciado ancho */
+@utility etiqueta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------- Película ---------- */
+
+/* Tira de película con sus perforaciones arriba y abajo */
+.pelicula {
+  --perf: 10px;
+  position: relative;
+  background: var(--pelicula);
+  padding-top: calc(var(--perf) + 24px);
+  padding-bottom: calc(var(--perf) + 14px);
+}
+.pelicula::before,
+.pelicula::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: var(--perf);
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 7px,
+    color-mix(in srgb, var(--papel) 88%, transparent) 7px 17px,
+    transparent 17px 26px
+  );
+  border-radius: 1px;
+}
+.pelicula::before {
+  top: 6px;
+}
+.pelicula::after {
+  bottom: 6px;
+}
+
+/* Texto impreso en el borde de la película */
+.borde-impreso {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  color: var(--ambar);
+}
+
+/* Fotograma sin exponer: base de la película con un velo de luz en el borde */
+.sin-exponer {
+  background:
+    linear-gradient(100deg, rgb(224 154 62 / 0.16), transparent 38%),
+    radial-gradient(120% 80% at 0% 100%, rgb(210 38 28 / 0.1), transparent 60%),
+    #2a2520;
+}
+
+/* Revelado: la foto entra como negativo y pasa por el espectro hasta positivo */
+.revelar {
+  opacity: 0;
+}
+.revelar.is-revelada {
+  animation: revelar 1.6s cubic-bezier(0.3, 0.6, 0.2, 1) both;
+  animation-delay: var(--retardo, 0ms);
+}
+@keyframes revelar {
+  0% {
+    opacity: 0;
+    filter: invert(1) sepia(0.6) saturate(2.4) hue-rotate(-20deg) brightness(0.8);
+  }
+  12% {
+    opacity: 1;
+  }
+  55% {
+    filter: invert(0.35) saturate(2.2) hue-rotate(200deg) brightness(1.05);
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+/* Círculo de lápiz graso que se dibuja solo */
+.trazo path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.55s cubic-bezier(0.6, 0, 0.3, 1);
+}
+.trazo.is-dibujado path,
+.group:hover .trazo path,
+.group:focus-visible .trazo path {
+  stroke-dashoffset: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -134,51 +186,7 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* Hero: fotos que se alternan con fundido y un acercamiento lento */
-.hero-foto {
-  opacity: 0;
-  transition: opacity 1.8s ease;
-}
-.hero-foto.is-active {
-  opacity: 1;
-}
-.hero-foto.is-drifting {
-  animation: hero-drift 9s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
-}
-@keyframes hero-drift {
-  from {
-    transform: scale(1.08);
+  .revelar {
+    opacity: 1;
   }
-  to {
-    transform: scale(1);
-  }
-}
-
-/* El texto del Hero aparece cuando termina de abrirse el diafragma */
-.hero-reveal {
-  opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 0.9s ease,
-    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-[data-open="true"] .hero-reveal {
-  opacity: 1;
-  transform: none;
-}
-
-/* Paquete sin foto: brillo iridiscente apagado, distinto en cada fila. */
-.paquete-mosaico {
-  background:
-    radial-gradient(120% 90% at 85% 110%, color-mix(in oklab, var(--iris-violeta) 22%, transparent), transparent 60%),
-    radial-gradient(90% 80% at 10% -10%, color-mix(in oklab, var(--iris-agua) 16%, transparent), transparent 55%),
-    var(--card);
-}
-li:nth-child(even) .paquete-mosaico {
-  background:
-    radial-gradient(120% 90% at 15% 110%, color-mix(in oklab, var(--iris-cobre) 20%, transparent), transparent 60%),
-    radial-gradient(90% 80% at 90% -10%, color-mix(in oklab, var(--iris-rosa) 16%, transparent), transparent 55%),
-    var(--card);
 }

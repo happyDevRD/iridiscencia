@@ -30,13 +30,14 @@ function enviarSinBackend(data: FormData): void {
   }
 }
 
-const TIPOS = [...paquetesData.paquetes.map((p) => p.nombre), "Otro"];
+const VARIAS = "Varias sesiones";
+const TIPOS = [...paquetesData.paquetes.map((p) => p.nombre), VARIAS, "Otro"];
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: (id: string) => React.ReactNode }) {
   const id = useId();
   return (
     <div>
-      <label htmlFor={id} className="mb-2 block text-sm text-foreground/85">
+      <label htmlFor={id} className="mb-2 block text-sm font-medium">
         {label}
         {hint && <span className="text-muted-foreground"> ({hint})</span>}
       </label>
@@ -48,12 +49,15 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [tipo, setTipo] = useState("");
+  const [mensaje, setMensaje] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
-  // "Cotizar este paquete" sin WhatsApp configurado preselecciona el tipo aquí.
+  // La hoja de pedido, sin WhatsApp configurado, trae aquí las sesiones marcadas.
   useEffect(() => {
     function handleCotizar(e: Event) {
-      setTipo((e as CustomEvent<string>).detail);
+      const nombres = (e as CustomEvent<string[]>).detail;
+      setTipo(nombres.length === 1 ? nombres[0] : VARIAS);
+      if (nombres.length > 1) setMensaje(`Me interesan: ${nombres.join(", ")}.`);
     }
     window.addEventListener(COTIZAR_EVENT, handleCotizar);
     return () => window.removeEventListener(COTIZAR_EVENT, handleCotizar);
@@ -69,6 +73,7 @@ export function ContactForm() {
       enviarSinBackend(formData);
       form.reset();
       setTipo("");
+      setMensaje("");
       setStatus("sent");
       return;
     }
@@ -82,6 +87,7 @@ export function ContactForm() {
       if (!data.success) throw new Error(data.message);
       form.reset();
       setTipo("");
+      setMensaje("");
       setStatus("sent");
     } catch {
       setStatus("error");
@@ -91,7 +97,7 @@ export function ContactForm() {
   if (status === "sent") {
     return (
       <div className="border-t border-border pt-8" role="status">
-        <p className="font-display text-3xl">{WEB3FORMS_KEY ? "Mensaje enviado." : "Ya casi."}</p>
+        <p className="text-3xl font-semibold [font-stretch:72%]">{WEB3FORMS_KEY ? "Mensaje enviado." : "Ya casi."}</p>
         <p className="mt-3 text-muted-foreground">
           {WEB3FORMS_KEY
             ? "Te escribimos al número que dejaste con la cotización."
@@ -128,7 +134,7 @@ export function ContactForm() {
               required
               value={tipo}
               onChange={(e) => setTipo(e.target.value)}
-              className="flex h-11 w-full rounded-lg border border-input bg-background px-4 text-sm text-foreground outline-none focus-visible:border-ring"
+              className="flex h-12 w-full rounded-sm border border-input bg-background px-4 text-base text-foreground outline-none focus-visible:border-ring"
             >
               <option value="" disabled>
                 Elige uno
@@ -140,18 +146,18 @@ export function ContactForm() {
           )}
         </Field>
         <Field label="Fecha del evento" hint="si ya la tienes">
-          {(id) => <Input id={id} name="fecha" type="date" className="[color-scheme:dark]" />}
+          {(id) => <Input id={id} name="fecha" type="date"  />}
         </Field>
       </div>
 
       <Field label="Cuéntanos del evento" hint="lugar, cantidad de horas, ideas">
-        {(id) => <Textarea id={id} name="mensaje" rows={4} />}
+        {(id) => <Textarea id={id} name="mensaje" rows={4} value={mensaje} onChange={(e) => setMensaje(e.target.value)} />}
       </Field>
 
       <button
         type="submit"
         disabled={status === "sending"}
-        className="inline-flex h-12 w-full items-center justify-center rounded-full bg-foreground font-medium text-background transition-colors hover:bg-foreground/85 disabled:opacity-60"
+        className="inline-flex h-12 w-full items-center justify-center rounded-sm bg-foreground font-medium text-background transition-colors hover:bg-foreground/85 disabled:opacity-60"
       >
         {status === "sending" ? "Enviando…" : "Pedir cotización"}
       </button>
