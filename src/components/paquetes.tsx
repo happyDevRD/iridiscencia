@@ -12,10 +12,13 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 type Paquete = (typeof paquetesData.paquetes)[number];
 
-/** Foto de la carpeta del NAS de esa sesión; si no hay, la del CMS; si tampoco, otra de la galería. */
-function imagenDe(paquete: Paquete, galeria: GalleryManifest | null | undefined, otra?: string): string {
-  const categoria = galeria?.categorias.find((c) => c.id === paquete.galeria);
-  return categoria?.fotos[0]?.src || paquete.imagen || otra || "";
+/**
+ * Foto de la carpeta del NAS de esa sesión (la n-ésima si otra sesión ya usa la
+ * misma carpeta); si no hay, la del CMS; si tampoco, otra de la galería.
+ */
+function imagenDe(paquete: Paquete, galeria: GalleryManifest | null | undefined, n: number, otra?: string): string {
+  const fotos = galeria?.categorias.find((c) => c.id === paquete.galeria)?.fotos ?? [];
+  return fotos[n % Math.max(1, fotos.length)]?.src || paquete.imagen || otra || "";
 }
 
 function precioDe(paquete: Paquete, combos: CatalogoProducto[], catalogo: Catalogo | null) {
@@ -76,9 +79,11 @@ export function Paquetes() {
 
   const paquetes = useMemo(() => {
     const otras = conRelleno(fotosDeGaleria(galeria), paquetesData.paquetes.length);
+    const usadas: Record<string, number> = {};
     return paquetesData.paquetes.map((p, i) => {
       const combos = productosPorPrefijo(catalogo, p.prefijosSku ?? []);
-      return { paquete: p, combos, imagen: imagenDe(p, galeria, otras[i]?.src), precio: precioDe(p, combos, catalogo) };
+      const n = (usadas[p.galeria] = (usadas[p.galeria] ?? -1) + 1);
+      return { paquete: p, combos, imagen: imagenDe(p, galeria, n * 3, otras[i]?.src), precio: precioDe(p, combos, catalogo) };
     });
   }, [catalogo, galeria]);
 

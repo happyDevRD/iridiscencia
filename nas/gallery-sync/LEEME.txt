@@ -18,6 +18,7 @@ CARPETAS
   07 Niños y bebés
   08 Eventos corporativos
   09 Retratos
+  10 Familia
   _Sin publicar         Para dejar fotos guardadas que todavía NO deben
                         salir en la web. Nada de aquí se publica.
 
@@ -34,7 +35,7 @@ REGLAS
   6. Para quitar una foto de la web, bórrala o muévela a "_Sin publicar".
   7. Una carpeta vacía no aparece en la web. Puedes crear categorías
      nuevas con el mismo formato: número, espacio y nombre
-     ("10 Bautizos"). El número solo sirve para ordenar.
+     ("11 Bautizos"). El número solo sirve para ordenar.
   8. No toques las carpetas "_thumbs" ni "_web" ni el archivo
      "manifest.json": se generan solos.
 

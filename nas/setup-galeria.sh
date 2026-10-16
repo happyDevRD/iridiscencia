@@ -14,7 +14,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 
 CARPETAS=(
   "00 Portada" "01 Bodas" "02 Pre-boda" "03 XV Años" "04 Maternidad" "05 Graduaciones"
-  "06 Cumpleaños" "07 Niños y bebés" "08 Eventos corporativos" "09 Retratos" "_Sin publicar"
+  "06 Cumpleaños" "07 Niños y bebés" "08 Eventos corporativos" "09 Retratos" "10 Familia" "_Sin publicar"
 )
 
 remote() { ssh -o LogLevel=ERROR ds420 "$@"; }
