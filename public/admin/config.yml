@@ -52,5 +52,6 @@ collections:
               - { label: "Identificador", name: "id", widget: "string" }
               - { label: "Nombre", name: "nombre", widget: "string" }
               - { label: "Descripción", name: "descripcion", widget: "text" }
-              - { label: "Precio desde", name: "precioDesde", widget: "string" }
+              - { label: "Precio desde", name: "precioDesde", widget: "string", hint: "Solo se usa si el paquete no tiene combos en ProStock." }
+              - { label: "Prefijos de SKU en ProStock", name: "prefijosSku", widget: "list", required: false, hint: "Ej. SES-BOD. Los combos cuyo SKU empieza así se muestran con su precio real." }
               - { label: "Imagen", name: "imagen", widget: "image" }

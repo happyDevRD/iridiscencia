@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     volumes:
       - /volume1/Galeria:/usr/share/nginx/html/galeria:ro
+      - /volume1/docker/iridiscencia-catalogo:/usr/share/nginx/html/catalogo:ro
       - ./gallery-nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - web

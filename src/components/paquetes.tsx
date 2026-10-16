@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import paquetesData from "@/content/paquetes.json";
+import { type Catalogo, fetchCatalogo, formatoPrecio, productosPorPrefijo } from "@/lib/catalogo";
 import { COTIZAR_EVENT, whatsappUrl } from "@/lib/contact";
 
 function precio(precioDesde: string) {
@@ -7,6 +9,19 @@ function precio(precioDesde: string) {
 }
 
 export function Paquetes() {
+  // Los combos y precios salen de ProStock; si el catálogo no carga, cada
+  // paquete se muestra igual que antes, con el texto del CMS.
+  const [catalogo, setCatalogo] = useState<Catalogo | null>(null);
+  useEffect(() => {
+    let vivo = true;
+    fetchCatalogo().then((c) => {
+      if (vivo) setCatalogo(c);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
   return (
     <section id="paquetes" className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
@@ -20,19 +35,46 @@ export function Paquetes() {
 
         <ul className="mt-14 divide-y divide-border border-y border-border">
           {paquetesData.paquetes.map((paquete) => {
+            const combos = productosPorPrefijo(catalogo, paquete.prefijosSku ?? []);
             const wa = whatsappUrl(`Hola, quiero cotizar el paquete de ${paquete.nombre}.`);
             return (
               <li key={paquete.id} className="grid gap-6 py-8 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
                 <div className="aspect-[3/2] overflow-hidden rounded-sm bg-card">
-                  <img src={paquete.imagen} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                  {paquete.imagen && (
+                    <img src={paquete.imagen} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                  )}
                 </div>
                 <div className="flex flex-col justify-between gap-6">
                   <div>
                     <h3 className="text-4xl leading-tight">{paquete.nombre}</h3>
                     <p className="mt-3 max-w-prose leading-relaxed text-muted-foreground">{paquete.descripcion}</p>
+                    {combos.length > 0 && (
+                      <ul className="mt-6 divide-y divide-border border-t border-border">
+                        {combos.map((combo) => (
+                          <li key={combo.sku} className="flex flex-col gap-1 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                            <div className="min-w-0">
+                              <p className="font-medium">{combo.nombre}</p>
+                              {combo.incluye.length > 0 && (
+                                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{combo.incluye.join(" · ")}</p>
+                              )}
+                            </div>
+                            <p className="shrink-0 text-sm tabular-nums">
+                              {combo.enPromocion && (
+                                <span className="mr-2 text-muted-foreground line-through">{formatoPrecio(combo.precioRegular)}</span>
+                              )}
+                              {formatoPrecio(combo.precio)}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                   <div className="flex flex-wrap items-center justify-between gap-4">
-                    <p className="text-sm text-muted-foreground">{precio(paquete.precioDesde)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {combos.length > 0
+                        ? `Desde ${formatoPrecio(combos[0].precio)}${catalogo?.preciosIncluyenItbis ? " · ITBIS incluido" : ""}`
+                        : precio(paquete.precioDesde)}
+                    </p>
                     <a
                       href={wa ?? "#contacto"}
                       target={wa ? "_blank" : undefined}

@@ -69,9 +69,19 @@ Sheet de trabajo en Google Drive: "Irisdicencia — Catálogo organizado (propue
 
 Tabla `products` (DTO `ProductDto`): `id`, `sku`, `name`, `description` (ítems separados por " · "), `category_id`, `selling_price`, `effectiveSellingPrice` (con promoción), `promo_price`, `promo_percent_off`, `promo_start_date`, `promo_end_date`, `status` (`ACTIVE`, `INACTIVE` o `DISCONTINUED`), `icon`, imágenes (`ProductImage`, servidas en `/uploads/**`). No hay campo que diga qué productos van a la web, así que habrá que decidir si se publica por categoría o se agrega un campo `visible_web`.
 
-## Opciones de integración (sin decidir)
+## Integración implementada (opción 1, 2026-10-16)
 
-1. **Exportación a JSON en el NAS (recomendada para empezar).** Un proceso dentro de la LAN genera `catalogo.json` con los productos activos publicables (sin costo ni stock) y lo deja junto a la galería. `gallery-nginx` ya lo sirve con CORS en `galeria.iridiscencia.com`. La web lo carga igual que `manifest.json`.
+- **Exportador:** servicio `catalogo-export` en el stack `prostock-irisdicencia` del NAS (fuente en `~/nas/irisdicencia-ds420/prostock-compose/catalogo-export/` de house-pc). Usa la imagen `postgres:16-alpine` (ya en el NAS) y unos 1,5 MB de RAM.
+  - Cada 5 minutos ejecuta `catalogo.sql` y reescribe `/volume1/docker/iridiscencia-catalogo/catalogo.json`, solo si cambiaron los datos.
+  - Si la consulta falla, conserva el último archivo bueno y lo registra en `docker logs prostock-irisdicencia-catalogo-export-1`.
+- **Usuario de base de datos `catalogo_web`:** solo `SELECT` sobre `products`, `categories` y `company_config`, con límite de 2 conexiones. La contraseña está en `CATALOGO_DB_PASSWORD` del `.env` del stack (600).
+- **Publicación:** hoy el contenedor `iridiscencia-web` del NAS monta esa carpeta en `/catalogo/`, así que el archivo está en `https://iridiscencia.com/catalogo/catalogo.json` (mismo origen, sin CORS). Cuando el sitio pase a Cloudflare Pages lo servirá `gallery-nginx` en `galeria.iridiscencia.com/catalogo/` con CORS (ya preparado en `nas/`).
+- **Formato:** `{generado, moneda, preciosIncluyenItbis, categorias: [{id, nombre, productos: [{sku, nombre, descripcion, incluye[], precio, precioRegular, enPromocion, icono}]}]}`. Incluye solo productos `ACTIVE` y `for_sale`. `precio` ya aplica la promoción vigente (misma regla que `PromoPriceUtils`, con fecha de RD).
+- **Web:** `src/lib/catalogo.ts` carga el archivo desde `${VITE_GALLERY_BASE_URL}/catalogo/catalogo.json`. Cada paquete de `src/content/paquetes.json` tiene `prefijosSku` (editable en el CMS); `src/components/paquetes.tsx` lista los combos que empiezan así, con precio y lo que incluyen, y muestra "Desde RD$ X". Sin prefijos, o si el catálogo no carga, se usa el texto del CMS. En `npm run dev` hay un proxy de `/catalogo` hacia `iridiscencia.com`.
+
+## Otras opciones de integración
+
+1. **Exportación a JSON en el NAS (la implementada).** Un proceso dentro de la LAN genera `catalogo.json` con los productos activos publicables (sin costo ni stock) y lo deja junto a la galería. `gallery-nginx` ya lo sirve con CORS en `galeria.iridiscencia.com`. La web lo carga igual que `manifest.json`.
    - ProStock sigue sin exponerse a internet.
    - Sin rebuild del sitio y casi sin costo de RAM en el NAS (1,75 GB).
    - El proceso puede ser un endpoint interno de ProStock, o una consulta SQL programada en el Programador de tareas de DSM (no se puede crear por SSH sin sudo interactivo).

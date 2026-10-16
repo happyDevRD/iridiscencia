@@ -5,20 +5,63 @@
       "nombre": "Bodas",
       "descripcion": "Cobertura completa de tu boda, desde los preparativos hasta la fiesta.",
       "precioDesde": "Consultar",
+      "prefijosSku": ["SES-BOD"],
       "imagen": "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&q=80&auto=format&fit=crop"
+    },
+    {
+      "id": "pre-boda",
+      "nombre": "Pre-boda",
+      "descripcion": "Sesión de pareja antes de la boda.",
+      "precioDesde": "Consultar",
+      "prefijosSku": ["SES-PRB"],
+      "imagen": ""
     },
     {
       "id": "xv-anos",
       "nombre": "XV Años",
       "descripcion": "Sesión de estudio + cobertura de la celebración.",
       "precioDesde": "Consultar",
+      "prefijosSku": ["SES-XV"],
       "imagen": "https://images.unsplash.com/photo-1714611302520-5afa2c3e26df?w=800&q=80&auto=format&fit=crop"
+    },
+    {
+      "id": "graduacion",
+      "nombre": "Graduación universitaria",
+      "descripcion": "Fotos de graduación con foto enmarcada y llaveros incluidos.",
+      "precioDesde": "Consultar",
+      "prefijosSku": ["SES-GRA"],
+      "imagen": ""
+    },
+    {
+      "id": "bachiller",
+      "nombre": "Bachiller",
+      "descripcion": "Sesión de graduación de bachillerato.",
+      "precioDesde": "Consultar",
+      "prefijosSku": ["SES-BAC"],
+      "imagen": ""
+    },
+    {
+      "id": "cumpleanos",
+      "nombre": "Cumpleaños",
+      "descripcion": "Sesión de estudio para celebrar tu cumpleaños.",
+      "precioDesde": "Consultar",
+      "prefijosSku": ["SES-CUM"],
+      "imagen": ""
+    },
+    {
+      "id": "ninos-bebes",
+      "nombre": "Niños y bebés",
+      "descripcion": "Sesión de estudio para los más pequeños de la casa.",
+      "precioDesde": "Consultar",
+      "prefijosSku": ["SES-BEB"],
+      "imagen": ""
     },
     {
       "id": "corporativo",
       "nombre": "Corporativo",
       "descripcion": "Retratos de equipo, eventos empresariales y cobertura institucional.",
       "precioDesde": "Consultar",
+      "prefijosSku": [],
       "imagen": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80&auto=format&fit=crop"
     },
     {
@@ -26,6 +69,7 @@
       "nombre": "Retratos",
       "descripcion": "Sesión de estudio o exteriores, individual o familiar.",
       "precioDesde": "Consultar",
+      "prefijosSku": [],
       "imagen": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80&auto=format&fit=crop"
     }
   ]
