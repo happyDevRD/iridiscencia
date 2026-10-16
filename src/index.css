@@ -5,51 +5,42 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-display: var(--font-sans);
-  --font-mono: var(--font-mono);
-  --font-mano: var(--font-mano);
+  --font-display: var(--font-display);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-pelicula: var(--pelicula);
-  --color-ambar: var(--ambar);
-  --color-lapiz: var(--lapiz);
-  --color-papel: var(--papel);
-  --color-velado: var(--velado);
-  --color-sin-exponer: var(--sin-exponer);
-  --radius-sm: 2px;
-  --radius-lg: 4px;
+  --color-tinta: var(--tinta);
+  --color-blanco: var(--blanco);
+  --radius-sm: 6px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
+  --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root {
   color-scheme: light;
-  --font-sans: "Archivo", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --font-mano: "Nanum Pen Script", "Comic Sans MS", cursive;
+  --font-sans: "Hanken Grotesk", system-ui, sans-serif;
+  --font-display: "Bodoni Moda", "Didot", serif;
 
-  /* Hoja de contactos: papel baritado, copias blancas, tiras de película y el
-     lápiz graso rojo con que el fotógrafo marca las elegidas. */
-  --papel: #ecebe6;
-  --copia: #fafaf7;
-  --tinta: #18181b;
-  --grafito: #5c5b56;
-  --linea: #cfcec8;
-  --pelicula: #1d1b18;
-  --ambar: #e09a3e;
-  --lapiz: #d2261c;
-  --velado: #b9b7af; /* texto secundario sobre película */
-  --sin-exponer: #0e0d0b;
+  /* Blanco de galería: las fotos ponen el color. */
+  --blanco: #ffffff;
+  --hueso: #f4f3f1;
+  --tinta: #131313;
+  --gris: #6b6965;
+  --linea: #e6e4e0;
 
-  --background: var(--papel);
+  --background: var(--blanco);
   --foreground: var(--tinta);
-  --card: var(--copia);
+  --card: var(--hueso);
   --card-foreground: var(--tinta);
-  --muted-foreground: var(--grafito);
-  --destructive: var(--lapiz);
+  --muted: var(--hueso);
+  --muted-foreground: var(--gris);
+  --destructive: #b42318;
   --border: var(--linea);
   --input: var(--linea);
   --ring: var(--tinta);
@@ -61,11 +52,18 @@
   }
   html {
     @apply font-sans;
-    scroll-behavior: smooth;
-    scroll-padding-top: 4.5rem;
+    scroll-padding-top: 5rem;
+  }
+  html.lenis,
+  html.lenis body {
+    height: auto;
   }
   body {
     @apply bg-background text-foreground antialiased;
+  }
+  ::selection {
+    background: var(--tinta);
+    color: var(--blanco);
   }
   :focus-visible {
     outline: 2px solid var(--tinta);
@@ -74,119 +72,39 @@
   h1,
   h2,
   h3 {
-    font-stretch: 72%;
-    font-weight: 600;
-    letter-spacing: -0.025em;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-optical-sizing: auto;
+    letter-spacing: -0.035em;
     text-wrap: balance;
   }
 }
 
-/* Etiquetas de laboratorio: mono, mayúsculas, espaciado ancho */
-@utility etiqueta {
-  font-family: var(--font-mono);
+/* Antetítulo pequeño en mayúsculas */
+@utility antetitulo {
   font-size: 0.75rem;
   line-height: 1rem;
-  letter-spacing: 0.12em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
-/* ---------- Película ---------- */
-
-/* Tira de película con sus perforaciones arriba y abajo */
-.pelicula {
-  --perf: 10px;
-  position: relative;
-  background: var(--pelicula);
-  padding-top: calc(var(--perf) + 24px);
-  padding-bottom: calc(var(--perf) + 14px);
-}
-.pelicula::before,
-.pelicula::after {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  height: var(--perf);
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0 7px,
-    color-mix(in srgb, var(--papel) 88%, transparent) 7px 17px,
-    transparent 17px 26px
-  );
-  border-radius: 1px;
-}
-.pelicula::before {
-  top: 6px;
-}
-.pelicula::after {
-  bottom: 6px;
-}
-
-/* Texto impreso en el borde de la película */
-.borde-impreso {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  line-height: 1;
-  letter-spacing: 0.14em;
-  color: var(--ambar);
-}
-
-/* Fotograma sin exponer: base de la película con un velo de luz en el borde */
-.sin-exponer {
-  background:
-    linear-gradient(100deg, rgb(224 154 62 / 0.16), transparent 38%),
-    radial-gradient(120% 80% at 0% 100%, rgb(210 38 28 / 0.1), transparent 60%),
-    #2a2520;
-}
-
-/* Revelado: la foto entra como negativo y pasa por el espectro hasta positivo */
-.revelar {
-  opacity: 0;
-}
-.revelar.is-revelada {
-  animation: revelar 1.6s cubic-bezier(0.3, 0.6, 0.2, 1) both;
-  animation-delay: var(--retardo, 0ms);
-}
-@keyframes revelar {
-  0% {
-    opacity: 0;
-    filter: invert(1) sepia(0.6) saturate(2.4) hue-rotate(-20deg) brightness(0.8);
-  }
-  12% {
-    opacity: 1;
-  }
-  55% {
-    filter: invert(0.35) saturate(2.2) hue-rotate(200deg) brightness(1.05);
-  }
-  100% {
-    opacity: 1;
-    filter: none;
+/* Cinta de servicios que corre sola */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
   }
 }
-
-/* Círculo de lápiz graso que se dibuja solo */
-.trazo path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  transition: stroke-dashoffset 0.55s cubic-bezier(0.6, 0, 0.3, 1);
-}
-.trazo.is-dibujado path,
-.group:hover .trazo path,
-.group:focus-visible .trazo path {
-  stroke-dashoffset: 0;
+.marquee {
+  animation: marquee 38s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-  .revelar {
-    opacity: 1;
   }
 }

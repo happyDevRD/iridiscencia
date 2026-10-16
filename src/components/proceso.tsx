@@ -1,25 +1,29 @@
+import { FadeUp, RevealText } from "@/components/motion";
+
 const PASOS = [
   { titulo: "Escríbenos", texto: "Cuéntanos qué celebras, la fecha y el lugar. Por WhatsApp o con el formulario." },
-  { titulo: "Recibe la cotización", texto: "Te enviamos las opciones y precios según las horas y lo que quieras recibir." },
-  { titulo: "Separa tu fecha", texto: "Con un anticipo, la fecha queda reservada para ti y nadie más la toma." },
-  { titulo: "Sesión y entrega", texto: "Fotografiamos tu día y te entregamos las fotos editadas." },
+  { titulo: "Recibe tu cotización", texto: "Te enviamos opciones y precios según las horas y lo que quieras recibir." },
+  { titulo: "Separa la fecha", texto: "Con un anticipo, el día queda reservado para ti." },
+  { titulo: "Sesión y entrega", texto: "Fotografiamos tu momento y te entregamos las fotos editadas." },
 ];
 
 export function Proceso() {
   return (
-    <section id="proceso" className="border-t border-border bg-pelicula text-papel">
-      <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-28">
-        <p className="etiqueta text-ambar">Cómo trabajamos</p>
-        <h2 className="mt-4 max-w-2xl text-5xl leading-none sm:text-6xl">De tu mensaje a tus fotos</h2>
+    <section id="proceso" className="py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <FadeUp>
+          <p className="antetitulo text-muted-foreground">Cómo trabajamos</p>
+        </FadeUp>
+        <RevealText text="De tu mensaje a tus fotos" italic={[5]} className="mt-4 max-w-3xl text-5xl leading-none sm:text-7xl" />
 
-        <ol className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+        <ol className="mt-16 grid gap-px overflow-hidden rounded-xl bg-border sm:grid-cols-2 lg:grid-cols-4">
           {PASOS.map((paso, i) => (
-            <li key={paso.titulo} className="border-t border-papel/25 pt-5">
-              <p className="borde-impreso text-[11px]" aria-hidden>
-                PASO {i + 1} ▸
-              </p>
-              <h3 className="mt-4 text-2xl leading-tight">{paso.titulo}</h3>
-              <p className="mt-3 leading-relaxed text-velado">{paso.texto}</p>
+            <li key={paso.titulo} className="bg-background">
+              <FadeUp delay={i * 0.1} className="flex h-full flex-col p-8">
+                <span className="font-display text-6xl italic leading-none text-foreground/20">{String(i + 1).padStart(2, "0")}</span>
+                <h3 className="mt-10 text-3xl leading-tight">{paso.titulo}</h3>
+                <p className="mt-3 leading-relaxed text-muted-foreground">{paso.texto}</p>
+              </FadeUp>
             </li>
           ))}
         </ol>

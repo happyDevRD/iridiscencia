@@ -97,7 +97,7 @@ export function ContactForm() {
   if (status === "sent") {
     return (
       <div className="border-t border-border pt-8" role="status">
-        <p className="text-3xl font-semibold [font-stretch:72%]">{WEB3FORMS_KEY ? "Mensaje enviado." : "Ya casi."}</p>
+        <p className="font-display text-4xl">{WEB3FORMS_KEY ? "Mensaje enviado." : "Ya casi."}</p>
         <p className="mt-3 text-muted-foreground">
           {WEB3FORMS_KEY
             ? "Te escribimos al número que dejaste con la cotización."
@@ -134,7 +134,7 @@ export function ContactForm() {
               required
               value={tipo}
               onChange={(e) => setTipo(e.target.value)}
-              className="flex h-12 w-full rounded-sm border border-input bg-background px-4 text-base text-foreground outline-none focus-visible:border-ring"
+              className="flex h-12 w-full rounded-lg border border-transparent bg-card px-4 text-base text-foreground outline-none focus-visible:border-ring"
             >
               <option value="" disabled>
                 Elige uno
@@ -157,7 +157,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="inline-flex h-12 w-full items-center justify-center rounded-sm bg-foreground font-medium text-background transition-colors hover:bg-foreground/85 disabled:opacity-60"
+        className="inline-flex h-12 w-full items-center justify-center rounded-full bg-foreground font-medium text-background transition-colors hover:bg-foreground/85 disabled:opacity-60"
       >
         {status === "sending" ? "Enviando…" : "Pedir cotización"}
       </button>

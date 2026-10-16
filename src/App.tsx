@@ -1,9 +1,11 @@
 import { useEffect } from "react";
+import Lenis from "lenis";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { ProyectosDestacados } from "@/components/proyectos-destacados";
 import { Paquetes } from "@/components/paquetes";
 import { Proceso } from "@/components/proceso";
+import { ZoomParallax } from "@/components/zoom-parallax";
 import { ContactoFooter } from "@/components/contacto-footer";
 
 /** React pinta después de que el navegador busca el ancla: enlaces como /#paquetes deben bajar igual. */
@@ -26,19 +28,30 @@ function useInitialHashScroll() {
   }, []);
 }
 
+/** Scroll con inercia, como en las webs de agencia; se desactiva con reduced motion. */
+function useSmoothScroll() {
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const lenis = new Lenis({ autoRaf: true, anchors: { offset: -72 } });
+    return () => lenis.destroy();
+  }, []);
+}
+
 export default function App() {
+  useSmoothScroll();
   useInitialHashScroll();
   return (
     <>
       <a
         href="#trabajo"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-sm focus:bg-foreground focus:px-4 focus:py-2 focus:text-background"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-foreground focus:px-4 focus:py-2 focus:text-background"
       >
         Saltar al contenido
       </a>
       <Navbar />
       <main>
         <Hero />
+        <ZoomParallax />
         <ProyectosDestacados />
         <Paquetes />
         <Proceso />
