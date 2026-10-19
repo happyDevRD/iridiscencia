@@ -24,7 +24,7 @@ export function ContactoFooter() {
   ].filter(Boolean) as { href: string; icon: typeof Mail; label: string; value: string; external: boolean }[];
 
   return (
-    <footer id="contacto" className="bg-card">
+    <footer id="contacto" data-parada="inicio" className="bg-card">
       <div className="mx-auto grid max-w-7xl gap-14 px-5 py-24 sm:px-8 sm:py-32 lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-5">
           <FadeUp>

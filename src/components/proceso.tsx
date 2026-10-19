@@ -9,7 +9,7 @@ const PASOS = [
 
 export function Proceso() {
   return (
-    <section id="proceso" className="py-24 sm:py-32">
+    <section id="proceso" data-parada="inicio" className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <FadeUp>
           <p className="antetitulo text-muted-foreground">Cómo trabajamos</p>

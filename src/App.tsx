@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
+import { paradasDeScroll } from "@/lib/paradas";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { ProyectosDestacados } from "@/components/proyectos-destacados";
@@ -28,12 +29,20 @@ function useInitialHashScroll() {
   }, []);
 }
 
-/** Scroll con inercia, como en las webs de agencia; se desactiva con reduced motion. */
+/**
+ * Scroll con inercia, como en las webs de agencia, y paradas suaves en las secciones
+ * (ver `lib/paradas.ts`); se desactiva con reduced motion. Los enlaces del menú llegan
+ * justo al inicio de cada sección, que ya deja sitio al menú con su propio margen.
+ */
 function useSmoothScroll() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const lenis = new Lenis({ autoRaf: true, anchors: { offset: -72 } });
-    return () => lenis.destroy();
+    const lenis = new Lenis({ autoRaf: true, anchors: true });
+    const quitarParadas = paradasDeScroll(lenis);
+    return () => {
+      quitarParadas();
+      lenis.destroy();
+    };
   }, []);
 }
 

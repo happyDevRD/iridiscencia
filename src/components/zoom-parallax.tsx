@@ -66,7 +66,7 @@ function Escena({ fotos }: { fotos: Foto[] }) {
   const textoY = useTransform(scrollYProgress, [0.72, 0.9], [30, 0]);
 
   return (
-    <section ref={ref} aria-label="Fotos destacadas" className="relative h-[300vh]">
+    <section ref={ref} aria-label="Fotos destacadas" data-parada="inicio fin" className="relative h-[300vh]">
       <div className="sticky top-0 h-svh overflow-hidden">
         {fotos.map((foto, i) => (
           <Capa key={foto.src} foto={foto} capa={CAPAS[i]} progress={scrollYProgress} i={i} />

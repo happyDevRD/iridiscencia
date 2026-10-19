@@ -16,6 +16,8 @@ Limpio, sobre blanco, con las fotos de protagonistas. Titulares en **Fraunces** 
 | Contacto | `contacto-footer.tsx` | Formulario y canales, con el nombre del estudio a todo el ancho |
 | Portal de clientes | `seleccion/SelectionApp.tsx` | `iridiscencia.com/seleccion/<token>`, para que el cliente elija sus fotos |
 
+**Scroll guiado** (`src/lib/paradas.ts`, sobre Lenis): si el scroll se detiene cerca del inicio de una sección marcada con `data-parada`, termina de llevarte a ella (30% de pantalla de margen; 45% en Sesiones, con `data-parada-fuerte`). Lejos de una parada el scroll es libre. Sesiones ocupa exactamente una pantalla para verse siempre entera; en pantallas bajas oculta la lista de combos.
+
 Helpers de animación: `src/components/motion.tsx`. Las fotos se reúnen en `src/lib/fotos.ts`; `conRelleno` completa con las fotos de stock de `site.json` y `paquetes.json` solo mientras el NAS tenga pocas.
 
 Diseños descartados por el cliente: oscuro con nombre iridiscente e intro de diafragma, y «hoja de contactos» (película y lápiz rojo).

@@ -76,8 +76,9 @@ function VerFotos({ n, onClick }: { n: number; onClick: () => void }) {
 
 function Combos({ combos }: { combos: CatalogoProducto[] }) {
   if (combos.length === 0) return null;
+  // En pantallas bajas no caben: queda el precio «Desde»
   return (
-    <ul className="mt-5 space-y-2 text-sm">
+    <ul className="mt-5 hidden space-y-2 text-sm [@media(min-height:760px)]:block">
       {combos.slice(0, 3).map((c) => (
         <li key={c.sku} className="flex items-baseline justify-between gap-4 border-b border-white/20 pb-2">
           <span className="min-w-0 truncate">{c.nombre}</span>
@@ -195,18 +196,24 @@ export function Paquetes() {
 
   const total = String(paquetes.length).padStart(2, "0");
 
+  // Ocupa justo una pantalla y es una parada fuerte del scroll: se ve siempre entera
   return (
-    <section id="sesiones" className="bg-tinta py-24 text-white sm:py-32">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <section
+      id="sesiones"
+      data-parada="inicio"
+      data-parada-fuerte
+      className="flex h-svh min-h-[600px] flex-col bg-tinta pb-5 pt-20 text-white sm:pt-24 lg:pb-3"
+    >
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <FadeUp>
               <p className="antetitulo text-white/55">Sesiones y precios</p>
             </FadeUp>
-            <RevealText text="Elige tu sesión" italic={[2]} className="mt-4 text-5xl leading-none sm:text-7xl" />
+            <RevealText text="Elige tu sesión" italic={[2]} className="mt-3 text-4xl leading-none sm:text-6xl" />
           </div>
-          <FadeUp delay={0.15} className="max-w-sm">
-            <p className="text-lg leading-relaxed text-white/65">
+          <FadeUp delay={0.15} className="hidden max-w-sm sm:block">
+            <p className="leading-relaxed text-white/65">
               Cada cobertura se arma según tu evento: horas, lugares y lo que quieras recibir.
             </p>
           </FadeUp>
@@ -214,7 +221,7 @@ export function Paquetes() {
       </div>
 
       {/* Escritorio: paneles de borde a borde que se expanden al pasar el ratón */}
-      <FadeUp delay={0.1} className="mx-auto mt-14 hidden h-[min(85svh,860px)] min-h-[560px] max-w-[1920px] gap-2 px-3 lg:flex">
+      <FadeUp delay={0.1} className="mx-auto mt-8 hidden min-h-0 w-full max-w-[1920px] flex-1 gap-2 px-3 lg:flex">
         {paquetes.map(({ paquete, combos, fotos, precio }, i) => {
           const abierto = i === activo;
           const numero = String(i + 1).padStart(2, "0");
@@ -283,12 +290,12 @@ export function Paquetes() {
                     exit={{ opacity: 0, transition: { duration: 0.15 } }}
                     onClick={(e) => e.stopPropagation()}
                     data-texto
-                    className="absolute bottom-0 left-0 max-w-xl cursor-auto p-10"
+                    className="absolute bottom-0 left-0 max-w-xl cursor-auto p-8 xl:p-10"
                   >
                     <p className="text-sm tabular-nums text-white/60">
                       {numero} <span className="text-white/35">/ {total}</span>
                     </p>
-                    <h3 className="mt-3 text-6xl leading-none xl:text-7xl">{paquete.nombre}</h3>
+                    <h3 className="mt-3 text-5xl leading-none xl:text-6xl">{paquete.nombre}</h3>
                     <p className="antetitulo mt-5 text-white/75">{precio}</p>
                     <p className="mt-4 max-w-md leading-relaxed text-white/85">{paquete.descripcion}</p>
                     <Combos combos={combos} />
@@ -307,11 +314,11 @@ export function Paquetes() {
       </FadeUp>
 
       {/* Móvil y tableta: carrusel de tarjetas */}
-      <ul className="mt-12 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-4 [scrollbar-width:none] sm:px-8 lg:hidden">
+      <ul className="mt-6 flex min-h-0 flex-1 snap-x snap-mandatory gap-3 overflow-x-auto px-5 [scrollbar-width:none] sm:px-8 lg:hidden">
         {paquetes.map(({ paquete, combos, fotos, precio }, i) => (
           <li
             key={paquete.id}
-            className="relative h-[min(78svh,600px)] min-h-[500px] w-[85vw] max-w-sm shrink-0 snap-center overflow-hidden rounded-2xl bg-white/5"
+            className="relative h-full w-[85vw] max-w-sm shrink-0 snap-center overflow-hidden rounded-2xl bg-white/5"
           >
             <Pase fotos={fotos} abierto={false} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 from-15% via-black/55 via-55% to-transparent" />
