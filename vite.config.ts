@@ -17,6 +17,7 @@ function jsonLd(): string {
     name: siteConfig.nombre,
     url: SITE_URL,
     image: `${SITE_URL}og.jpg`,
+    logo: `${SITE_URL}logo.png`,
     description: siteConfig.descripcion,
     email: contacto.email || undefined,
     telephone: contacto.telefono || contacto.whatsapp || undefined,

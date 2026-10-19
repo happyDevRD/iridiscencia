@@ -31,8 +31,9 @@ Diseños descartados por el cliente: oscuro con nombre iridiscente e intro de di
 
 ## Pendiente
 
-- [ ] **Contacto:** WhatsApp, teléfono, Instagram y dirección en `src/content/site.json`. Sin WhatsApp, los botones de cotizar llevan al formulario.
-- [ ] **Correo:** `iridiscencia.com` no tiene registro MX, así que `contacto@iridiscencia.com` no recibe nada. Activar Cloudflare Email Routing hacia el Gmail del estudio.
+- [x] **Contacto (2026-10-19):** teléfono +1 849-631-8221, correo iridiscenciaf@gmail.com y dirección (Plaza Dora, calle Porvenir) en `src/content/site.json`; logo oficial en `public/logo.png` e `isotipo.png` (componente `src/components/logo.tsx`, se pinta con `currentColor`) y favicons.
+- [ ] **WhatsApp e Instagram:** faltan en `site.json`. Sin WhatsApp, los botones de cotizar llevan al formulario.
+- [ ] **Correo propio (opcional):** la web ya usa iridiscenciaf@gmail.com. Para usar `contacto@iridiscencia.com` haría falta Cloudflare Email Routing hacia ese Gmail (el dominio no tiene MX).
 - [ ] **Formulario:** key de Web3Forms (`VITE_WEB3FORMS_KEY` en `.env.local` antes de `deploy-web.sh`).
 - [ ] **Fotos:** no hay de Pre-boda, hay pocas de Bodas y de Eventos, y la portada necesita fotos horizontales.
 - [ ] Revisar en un móvil real el zoom y el acordeón de Sesiones.

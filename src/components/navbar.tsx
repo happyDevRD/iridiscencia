@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import siteConfig from "@/content/site.json";
-import { cotizarHref, instagramUrl, whatsappUrl } from "@/lib/contact";
+import { cotizarHref, instagramUrl, telefonoUrl, whatsappUrl } from "@/lib/contact";
+import { Isotipo } from "@/components/logo";
 import { useHeroOscuro } from "@/components/heroes/usos";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,7 @@ export function Navbar() {
   const { scrollY } = useScroll();
   const whatsapp = whatsappUrl("Hola, quiero cotizar una sesión con Iridiscencia.");
   const instagram = instagramUrl();
+  const telefono = telefonoUrl();
   const heroOscuro = useHeroOscuro();
   // Texto blanco sobre el hero oscuro y con el menú móvil abierto (fondo oscuro)
   const oscuro = open || (heroOscuro && sobreHero);
@@ -86,7 +88,8 @@ export function Navbar() {
             oscuro && "text-white"
           )}
         >
-          <a href="#inicio" onClick={() => setOpen(false)} className="font-display text-2xl tracking-tight">
+          <a href="#inicio" onClick={() => setOpen(false)} className="flex items-center gap-2.5 font-display text-2xl tracking-tight">
+            <Isotipo className="size-9" />
             {siteConfig.nombre}
           </a>
 
@@ -198,10 +201,17 @@ export function Navbar() {
                 {whatsapp ? "Cotizar por WhatsApp" : "Pedir cotización"}
                 <ArrowUpRight className="size-4" aria-hidden />
               </a>
-              <div className="mt-6 flex items-center justify-between text-sm text-white/55">
-                <span>{siteConfig.ubicacion.split(",")[0]}</span>
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm text-white/80">
+                {telefono && (
+                  <a href={telefono} className="hover:text-white">
+                    {siteConfig.contacto.telefono}
+                  </a>
+                )}
+                <a href={`mailto:${siteConfig.contacto.email}`} className="hover:text-white">
+                  {siteConfig.contacto.email}
+                </a>
                 {instagram && (
-                  <a href={instagram} target="_blank" rel="noopener" className="text-white/80 hover:text-white">
+                  <a href={instagram} target="_blank" rel="noopener" className="hover:text-white">
                     Instagram
                   </a>
                 )}

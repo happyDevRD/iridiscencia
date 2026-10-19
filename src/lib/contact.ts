@@ -10,6 +10,18 @@ export function whatsappUrl(mensaje: string): string | null {
   return `https://wa.me/${whatsappDigits}?text=${encodeURIComponent(mensaje)}`;
 }
 
+/** Enlace para llamar, o null si no hay teléfono. */
+export function telefonoUrl(): string | null {
+  const digitos = (contacto.telefono ?? "").replace(/[^\d+]/g, "");
+  return digitos ? `tel:${digitos}` : null;
+}
+
+/** Búsqueda de la dirección del estudio en Google Maps. */
+export function mapaUrl(): string | null {
+  const dir = (contacto.direccion ?? "").trim();
+  return dir ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Iridiscencia, ${dir}`)}` : null;
+}
+
 export function instagramUrl(): string | null {
   const handle = (contacto.instagram ?? "").trim().replace(/^@/, "");
   if (!handle) return null;

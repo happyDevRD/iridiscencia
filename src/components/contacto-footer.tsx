@@ -1,14 +1,17 @@
-import { AtSign, Mail, MapPin, MessageCircle } from "lucide-react";
+import { AtSign, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import siteConfig from "@/content/site.json";
 import { ContactForm } from "@/components/contact-form";
 import { FadeUp, RevealText } from "@/components/motion";
-import { instagramUrl, whatsappUrl } from "@/lib/contact";
+import { instagramUrl, mapaUrl, telefonoUrl, whatsappUrl } from "@/lib/contact";
+import { LogoCompleto } from "@/components/logo";
 
 export function ContactoFooter() {
   const { contacto } = siteConfig;
   const whatsapp = whatsappUrl("Hola, quiero cotizar una sesión con Iridiscencia.");
   const instagram = instagramUrl();
+  const telefono = telefonoUrl();
+  const mapa = mapaUrl();
   const reduce = useReducedMotion();
 
   const canales = [
@@ -20,6 +23,7 @@ export function ContactoFooter() {
       value: `@${contacto.instagram.replace(/^@|.*instagram\.com\//g, "").replace(/\/$/, "")}`,
       external: true,
     },
+    telefono && { href: telefono, icon: Phone, label: "Teléfono", value: contacto.telefono, external: false },
     { href: `mailto:${contacto.email}`, icon: Mail, label: "Correo", value: contacto.email, external: false },
   ].filter(Boolean) as { href: string; icon: typeof Mail; label: string; value: string; external: boolean }[];
 
@@ -55,14 +59,21 @@ export function ContactoFooter() {
                   </a>
                 </li>
               ))}
-              <li className="flex items-center gap-4">
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-background">
-                  <MapPin className="size-4" aria-hidden />
-                </span>
-                <span>
-                  <span className="block text-sm text-muted-foreground">Estudio</span>
-                  {contacto.direccion || siteConfig.ubicacion}
-                </span>
+              <li>
+                <a
+                  href={mapa ?? undefined}
+                  target="_blank"
+                  rel="noopener"
+                  className="group flex items-start gap-4"
+                >
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-background">
+                    <MapPin className="size-4" aria-hidden />
+                  </span>
+                  <span className="max-w-sm">
+                    <span className="block text-sm text-muted-foreground">Estudio{mapa && " · ver en el mapa"}</span>
+                    <span className="underline-offset-4 group-hover:underline">{contacto.direccion || siteConfig.ubicacion}</span>
+                  </span>
+                </a>
               </li>
             </ul>
           </FadeUp>
@@ -84,7 +95,8 @@ export function ContactoFooter() {
         >
           {siteConfig.nombre}
         </motion.p>
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-8 text-sm text-muted-foreground sm:flex-row sm:justify-between sm:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <LogoCompleto className="h-14 text-foreground" />
           <p>
             © {new Date().getFullYear()} {siteConfig.nombre}. {siteConfig.ubicacion}.
           </p>
