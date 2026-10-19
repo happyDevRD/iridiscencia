@@ -12,23 +12,60 @@ const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY ?? "";
 /** Sin Web3Forms, la cotización sale por WhatsApp si el estudio tiene número. */
 const POR_WHATSAPP = !WEB3FORMS_KEY && Boolean(whatsappUrl(""));
 
-/** Sin Web3Forms configurado, la cotización sale redactada por WhatsApp o, en último caso, por correo. */
-function enviarSinBackend(data: FormData): void {
+/**
+ * Registra la solicitud en ProStock (bandeja "Solicitudes web" del estudio) y devuelve su
+ * referencia (S-0012). Si ProStock no responde a tiempo, sigue sin ella: la reserva no se pierde
+ * porque el mensaje igual sale por WhatsApp o correo.
+ */
+async function registrarSolicitud(data: FormData): Promise<string | null> {
+  const campo = (k: string) => String(data.get(k) ?? "").trim();
+  try {
+    const res = await fetch("/api/solicitudes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(5000),
+      body: JSON.stringify({
+        nombre: campo("nombre"),
+        telefono: campo("telefono"),
+        email: campo("email") || null,
+        tipoEvento: campo("tipo_evento") || null,
+        fecha: campo("fecha") || null,
+        mensaje: campo("mensaje") || null,
+        website: data.get("botcheck") ? "1" : null,
+      }),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { code?: string };
+    return json.code ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Sin Web3Forms configurado, la cotización sale redactada por WhatsApp o, en último caso, por correo.
+ * `ventana` es la pestaña abierta durante el clic (si se abriera después de esperar a ProStock,
+ * el navegador la bloquearía).
+ */
+function enviarSinBackend(data: FormData, referencia: string | null, ventana: Window | null): void {
   const campo = (k: string) => String(data.get(k) ?? "").trim();
   const texto = [
     `Hola, soy ${campo("nombre")}. Quiero cotizar: ${campo("tipo_evento")}.`,
     campo("fecha") && `Fecha: ${campo("fecha")}.`,
     campo("mensaje"),
     `Mi teléfono: ${campo("telefono")}${campo("email") ? ` · ${campo("email")}` : ""}`,
+    referencia && `Solicitud ${referencia}`,
   ]
     .filter(Boolean)
     .join("\n");
 
   const whatsapp = whatsappUrl(texto);
   if (whatsapp) {
-    window.open(whatsapp, "_blank", "noopener");
+    if (ventana) ventana.location.href = whatsapp;
+    else window.location.href = whatsapp;
   } else {
-    const asunto = `Cotización: ${campo("tipo_evento")}`;
+    ventana?.close();
+    const asunto = `Cotización: ${campo("tipo_evento")}${referencia ? ` (${referencia})` : ""}`;
     window.location.href = `mailto:${siteConfig.contacto.email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`;
   }
 }
@@ -73,15 +110,21 @@ export function ContactForm() {
 
     const formData = new FormData(form);
     if (!WEB3FORMS_KEY) {
-      enviarSinBackend(formData);
+      const ventana = whatsappUrl("") ? window.open("", "_blank") : null;
+      if (ventana) ventana.opener = null;
+      enviarSinBackend(formData, await registrarSolicitud(formData), ventana);
       form.reset();
       setTipo("");
       setMensaje("");
       setStatus("sent");
       return;
     }
+    const referencia = await registrarSolicitud(formData);
     formData.append("access_key", WEB3FORMS_KEY);
-    formData.append("subject", `Nueva cotización (${formData.get("tipo_evento") || "sin tipo"}) — ${siteConfig.nombre}`);
+    formData.append(
+      "subject",
+      `Nueva cotización (${formData.get("tipo_evento") || "sin tipo"})${referencia ? ` ${referencia}` : ""} — ${siteConfig.nombre}`,
+    );
     formData.append("from_name", "Web de Iridiscencia");
 
     try {

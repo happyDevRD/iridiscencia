@@ -52,6 +52,10 @@ export default defineConfig({
       "/catalogo": { target: "https://iridiscencia.com", changeOrigin: true },
       "/galeria": { target: "https://iridiscencia.com", changeOrigin: true },
       // Portal de selección: en producción lo hace el nginx del NAS; en desarrollo, un ProStock local.
+      "/api/solicitudes": {
+        target: process.env.SELECTION_API_TARGET ?? "http://localhost:8181",
+        rewrite: () => "/api/public/booking-requests",
+      },
       "/api/seleccion": {
         target: process.env.SELECTION_API_TARGET ?? "http://localhost:8181",
         rewrite: (p) => p.replace(/^\/api\/seleccion/, "/api/public/selection"),
