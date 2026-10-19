@@ -1,5 +1,5 @@
-import { motion, useReducedMotion } from "motion/react";
-import { Fragment, type ReactNode } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
+import { Fragment, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -62,8 +62,12 @@ export function FadeUp({ children, className, delay = 0 }: { children: ReactNode
   );
 }
 
-/** Imagen que se descubre de abajo arriba mientras se acerca un poco. */
-export function RevealImage({
+/**
+ * Foto que aparece con un fundido suave: sube apenas y pasa de un leve desenfoque a
+ * nítida. Espera a estar en pantalla y a haber cargado, para no fundir un hueco vacío;
+ * mientras tanto se ve el fondo con la proporción de la foto.
+ */
+export function FotoSuave({
   src,
   alt,
   className,
@@ -83,13 +87,15 @@ export function RevealImage({
   eager?: boolean;
 }) {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const enPantalla = useInView(ref, { once: true, margin: "0px 0px -5% 0px" });
+  const [cargada, setCargada] = useState(false);
+  const lista = reduce || (enPantalla && cargada);
   return (
-    <motion.div
-      className={cn("overflow-hidden", className)}
-      initial={reduce ? false : { clipPath: "inset(100% 0% 0% 0%)" }}
-      whileInView={{ clipPath: "inset(0% 0% 0% 0%)" }}
-      viewport={{ once: true, margin: "0px 0px -5% 0px" }}
-      transition={{ duration: 1.1, ease: EASE, delay }}
+    <div
+      ref={ref}
+      className={cn("overflow-hidden bg-card", className)}
+      style={{ aspectRatio: width && height ? `${width} / ${height}` : undefined }}
     >
       <motion.img
         src={src}
@@ -98,12 +104,12 @@ export function RevealImage({
         height={height}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
+        onLoad={() => setCargada(true)}
         className={cn("h-full w-full object-cover", imgClassName)}
-        initial={reduce ? false : { scale: 1.18 }}
-        whileInView={{ scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1.6, ease: EASE, delay }}
+        initial={reduce ? false : { opacity: 0, y: 18, filter: "blur(10px)" }}
+        animate={lista ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}
+        transition={{ duration: 0.9, ease: EASE, delay }}
       />
-    </motion.div>
+    </div>
   );
 }

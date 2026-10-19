@@ -4,7 +4,7 @@ import { useGaleria } from "@/lib/gallery";
 import { intercalar } from "@/lib/fotos";
 import { cotizarHref } from "@/lib/contact";
 import { Lightbox } from "@/components/lightbox";
-import { FadeUp, RevealImage, RevealText } from "@/components/motion";
+import { FadeUp, FotoSuave, RevealText } from "@/components/motion";
 
 const PAGE_SIZE = 16;
 
@@ -122,12 +122,12 @@ export function ProyectosDestacados() {
                       aria-label={`Ver ${foto.alt}`}
                       className="group relative block w-full overflow-hidden rounded-lg"
                     >
-                      <RevealImage
+                      <FotoSuave
                         src={foto.thumb}
                         alt=""
                         width={foto.w}
                         height={foto.h}
-                        delay={(i % 4) * 0.06}
+                        delay={(i % 4) * 0.08}
                         eager={i < 4}
                         className="rounded-lg"
                         imgClassName="h-auto transition-transform duration-700 ease-suave group-hover:scale-[1.04]"
