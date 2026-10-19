@@ -1,24 +1,39 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { ArrowUpRight } from "lucide-react";
+import { motion, AnimatePresence, type MotionValue, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { ArrowUpRight, Images } from "lucide-react";
 import paquetesData from "@/content/paquetes.json";
 import { type Catalogo, type CatalogoProducto, fetchCatalogo, formatoPrecio, productosPorPrefijo } from "@/lib/catalogo";
 import { COTIZAR_EVENT, whatsappUrl } from "@/lib/contact";
 import { useGaleria, type GalleryManifest } from "@/lib/gallery";
 import { FadeUp, RevealText } from "@/components/motion";
+import { Lightbox, type LightboxPhoto } from "@/components/lightbox";
 import { conRelleno, fotosDeGaleria } from "@/lib/fotos";
+import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+/** Fotos que pasan en el panel abierto, y cada cuánto cambian. */
+const FOTOS_PASE = 5;
+const INTERVALO = 5000;
 
 type Paquete = (typeof paquetesData.paquetes)[number];
 
 /**
- * Foto de la carpeta del NAS de esa sesión (la n-ésima si otra sesión ya usa la
- * misma carpeta); si no hay, la del CMS; si tampoco, otra de la galería.
+ * Fotos de la carpeta del NAS de esa sesión, empezando en la `inicio`-ésima para que dos
+ * sesiones que comparten carpeta no abran con la misma; si no hay, la del CMS o otra de la galería.
  */
-function imagenDe(paquete: Paquete, galeria: GalleryManifest | null | undefined, n: number, otra?: string): string {
+function fotosDe(paquete: Paquete, galeria: GalleryManifest | null | undefined, inicio: number, otra?: string): LightboxPhoto[] {
   const fotos = galeria?.categorias.find((c) => c.id === paquete.galeria)?.fotos ?? [];
-  return fotos[n % Math.max(1, fotos.length)]?.src || paquete.imagen || otra || "";
+  if (fotos.length === 0) {
+    const src = paquete.imagen || otra;
+    return src ? [{ src, alt: paquete.nombre, caption: paquete.nombre }] : [];
+  }
+  const desde = inicio % fotos.length;
+  return [...fotos.slice(desde), ...fotos.slice(0, desde)].map((f, i) => ({
+    src: f.src,
+    thumb: f.thumb,
+    alt: `${paquete.nombre}, foto ${i + 1} — Iridiscencia`,
+    caption: paquete.nombre,
+  }));
 }
 
 function precioDe(paquete: Paquete, combos: CatalogoProducto[], catalogo: Catalogo | null) {
@@ -27,7 +42,7 @@ function precioDe(paquete: Paquete, combos: CatalogoProducto[], catalogo: Catalo
   return !p || /consultar/i.test(p) ? "Precio según la cobertura" : `Desde ${p}`;
 }
 
-function Cotizar({ paquete, claro }: { paquete: Paquete; claro?: boolean }) {
+function Cotizar({ paquete }: { paquete: Paquete }) {
   const wa = whatsappUrl(`Hola, quiero cotizar una sesión de ${paquete.nombre}.`);
   return (
     <a
@@ -37,13 +52,25 @@ function Cotizar({ paquete, claro }: { paquete: Paquete; claro?: boolean }) {
       onClick={() => {
         if (!wa) window.dispatchEvent(new CustomEvent(COTIZAR_EVENT, { detail: [paquete.nombre] }));
       }}
-      className={`group inline-flex h-12 items-center gap-2 rounded-full pl-6 pr-4 text-sm font-medium transition-colors ${
-        claro ? "bg-white text-foreground hover:bg-white/85" : "bg-foreground text-background hover:bg-foreground/85"
-      }`}
+      className="group inline-flex h-12 items-center gap-2 rounded-full bg-white pl-6 pr-4 text-sm font-medium text-tinta transition-colors hover:bg-white/85"
     >
       Cotizar {paquete.nombre}
       <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
     </a>
+  );
+}
+
+function VerFotos({ n, onClick }: { n: number; onClick: () => void }) {
+  if (n < 2) return null;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex h-12 items-center gap-2 rounded-full border border-white/35 px-5 text-sm font-medium transition-colors hover:bg-white/10"
+    >
+      <Images className="size-4" aria-hidden />
+      Ver {n} fotos
+    </button>
   );
 }
 
@@ -61,10 +88,89 @@ function Combos({ combos }: { combos: CatalogoProducto[] }) {
   );
 }
 
+/**
+ * Fotos del panel: abierto, pasan solas con un fundido y un zoom lento hacia atrás;
+ * cerrado, se queda la primera un poco ampliada.
+ */
+function Pase({ fotos, abierto }: { fotos: LightboxPhoto[]; abierto: boolean }) {
+  const reduce = useReducedMotion();
+  const [n, setN] = useState(0);
+  const pase = fotos.slice(0, FOTOS_PASE);
+  const anima = abierto && !reduce && pase.length > 1;
+
+  useEffect(() => {
+    if (!anima) return;
+    const id = window.setInterval(() => setN((v) => (v + 1) % pase.length), INTERVALO);
+    return () => window.clearInterval(id);
+  }, [anima, pase.length]);
+
+  const foto = pase[abierto ? n % Math.max(1, pase.length) : 0];
+  if (!foto) return null;
+
+  return (
+    <>
+      <AnimatePresence initial={false}>
+        <motion.img
+          key={foto.src}
+          src={foto.src}
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover"
+          initial={{ opacity: 0, scale: 1.12 }}
+          animate={{ opacity: 1, scale: abierto && !reduce ? 1 : 1.15 }}
+          exit={{ opacity: 0 }}
+          transition={{ opacity: { duration: 1.2 }, scale: { duration: abierto ? INTERVALO / 1000 + 1.5 : 1, ease: abierto ? "linear" : EASE } }}
+        />
+      </AnimatePresence>
+      {anima && (
+        // Barras de progreso del pase
+        <div className="absolute inset-x-8 top-8 z-10 flex gap-1.5" aria-hidden>
+          {pase.map((f, i) => (
+            <span key={f.src} className="h-0.5 flex-1 overflow-hidden rounded-full bg-white/25">
+              {i <= n % pase.length && (
+                <motion.span
+                  key={i === n % pase.length ? `activa-${n}` : "llena"}
+                  className="block h-full origin-left bg-white"
+                  initial={{ scaleX: i === n % pase.length ? 0 : 1 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: i === n % pase.length ? INTERVALO / 1000 : 0, ease: "linear" }}
+                />
+              )}
+            </span>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+/** Círculo «Ver fotos» que sigue al ratón sobre el panel abierto. */
+function CursorVer({ x, y, visible }: { x: MotionValue<number>; y: MotionValue<number>; visible: boolean }) {
+  return (
+    <motion.div
+      aria-hidden
+      className="pointer-events-none absolute left-0 top-0 z-20 grid size-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-xs font-medium tracking-wide text-tinta backdrop-blur"
+      style={{ x, y }}
+      initial={false}
+      animate={{ scale: visible ? 1 : 0, opacity: visible ? 1 : 0 }}
+      transition={{ duration: 0.3, ease: EASE }}
+    >
+      Ver fotos
+    </motion.div>
+  );
+}
+
 export function Paquetes() {
   const [catalogo, setCatalogo] = useState<Catalogo | null>(null);
   const [activo, setActivo] = useState(0);
+  const [visor, setVisor] = useState<{ fotos: LightboxPhoto[]; i: number } | null>(null);
+  const [cursor, setCursor] = useState(false);
   const galeria = useGaleria();
+  const reduce = useReducedMotion();
+  const cx = useMotionValue(0);
+  const cy = useMotionValue(0);
+  const sx = useSpring(cx, { stiffness: 300, damping: 30 });
+  const sy = useSpring(cy, { stiffness: 300, damping: 30 });
 
   // Los combos y precios salen de ProStock; si el catálogo no carga se usa el texto del CMS.
   useEffect(() => {
@@ -83,117 +189,152 @@ export function Paquetes() {
     return paquetesData.paquetes.map((p, i) => {
       const combos = productosPorPrefijo(catalogo, p.prefijosSku ?? []);
       const n = (usadas[p.galeria] = (usadas[p.galeria] ?? -1) + 1);
-      return { paquete: p, combos, imagen: imagenDe(p, galeria, n * 3, otras[i]?.src), precio: precioDe(p, combos, catalogo) };
+      return { paquete: p, combos, fotos: fotosDe(p, galeria, n * FOTOS_PASE, otras[i]?.src), precio: precioDe(p, combos, catalogo) };
     });
   }, [catalogo, galeria]);
 
+  const total = String(paquetes.length).padStart(2, "0");
+
   return (
-    <section id="sesiones" className="bg-card py-24 sm:py-32">
+    <section id="sesiones" className="bg-tinta py-24 text-white sm:py-32">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <FadeUp>
-              <p className="antetitulo text-muted-foreground">Sesiones y precios</p>
+              <p className="antetitulo text-white/55">Sesiones y precios</p>
             </FadeUp>
             <RevealText text="Elige tu sesión" italic={[2]} className="mt-4 text-5xl leading-none sm:text-7xl" />
           </div>
           <FadeUp delay={0.15} className="max-w-sm">
-            <p className="text-lg leading-relaxed text-muted-foreground">
+            <p className="text-lg leading-relaxed text-white/65">
               Cada cobertura se arma según tu evento: horas, lugares y lo que quieras recibir.
             </p>
           </FadeUp>
         </div>
-
-        {/* Escritorio: paneles que se expanden al pasar el ratón */}
-        <FadeUp delay={0.1} className="mt-14 hidden h-[600px] gap-2 lg:flex">
-          {paquetes.map(({ paquete, combos, imagen, precio }, i) => {
-            const abierto = i === activo;
-            return (
-              <motion.div
-                key={paquete.id}
-                layout
-                onMouseEnter={() => setActivo(i)}
-                onFocus={() => setActivo(i)}
-                transition={{ duration: 0.7, ease: EASE }}
-                className="relative cursor-pointer overflow-hidden rounded-xl bg-foreground text-white"
-                style={{ flex: abierto ? 6 : 1 }}
-              >
-                {imagen && (
-                  <motion.img
-                    src={imagen}
-                    alt=""
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover"
-                    animate={{ scale: abierto ? 1 : 1.15 }}
-                    transition={{ duration: 1, ease: EASE }}
-                  />
-                )}
-                <div
-                  className={`absolute inset-0 transition-colors duration-700 ${abierto ? "bg-gradient-to-t from-black/80 via-black/20 to-transparent" : "bg-black/45"}`}
-                />
-
-                {/* Cerrado: nombre en vertical */}
-                <AnimatePresence>
-                  {!abierto && (
-                    <motion.button
-                      type="button"
-                      onClick={() => setActivo(i)}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="absolute inset-0 flex items-end justify-center pb-8"
-                      aria-label={`Ver ${paquete.nombre}`}
-                    >
-                      <span className="whitespace-nowrap font-display text-2xl [writing-mode:vertical-rl] rotate-180">
-                        {paquete.nombre}
-                      </span>
-                    </motion.button>
-                  )}
-                </AnimatePresence>
-
-                {/* Abierto: detalle */}
-                <AnimatePresence>
-                  {abierto && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0, transition: { delay: 0.25, duration: 0.6, ease: EASE } }}
-                      exit={{ opacity: 0, transition: { duration: 0.15 } }}
-                      className="absolute inset-x-0 bottom-0 max-w-xl p-8"
-                    >
-                      <p className="antetitulo text-white/75">{precio}</p>
-                      <h3 className="mt-3 text-5xl leading-none">{paquete.nombre}</h3>
-                      <p className="mt-4 max-w-md leading-relaxed text-white/85">{paquete.descripcion}</p>
-                      <Combos combos={combos} />
-                      <div className="mt-6">
-                        <Cotizar paquete={paquete} claro />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </FadeUp>
-
-        {/* Móvil y tableta: carrusel de tarjetas */}
-        <ul className="-mx-5 mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:hidden">
-          {paquetes.map(({ paquete, combos, imagen, precio }) => (
-            <li key={paquete.id} className="relative h-[520px] w-[82vw] max-w-sm shrink-0 snap-center overflow-hidden rounded-xl bg-foreground text-white">
-              {imagen && <img src={imagen} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6">
-                <p className="antetitulo text-white/75">{precio}</p>
-                <h3 className="mt-2 text-4xl leading-none">{paquete.nombre}</h3>
-                <p className="mt-3 leading-relaxed text-white/85">{paquete.descripcion}</p>
-                <Combos combos={combos} />
-                <div className="mt-5">
-                  <Cotizar paquete={paquete} claro />
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
       </div>
+
+      {/* Escritorio: paneles de borde a borde que se expanden al pasar el ratón */}
+      <FadeUp delay={0.1} className="mx-auto mt-14 hidden h-[min(85svh,860px)] min-h-[560px] max-w-[1920px] gap-2 px-3 lg:flex">
+        {paquetes.map(({ paquete, combos, fotos, precio }, i) => {
+          const abierto = i === activo;
+          const numero = String(i + 1).padStart(2, "0");
+          return (
+            <motion.div
+              key={paquete.id}
+              layout
+              onMouseEnter={() => setActivo(i)}
+              onFocus={() => setActivo(i)}
+              onPointerMove={(e) => {
+                if (!abierto) return;
+                const r = e.currentTarget.getBoundingClientRect();
+                cx.set(e.clientX - r.left);
+                cy.set(e.clientY - r.top);
+                // Sobre el texto y los botones vuelve el cursor normal
+                setCursor(!reduce && !(e.target as Element).closest("[data-texto]"));
+              }}
+              onPointerLeave={() => setCursor(false)}
+              onClick={() => abierto && fotos.length > 1 && setVisor({ fotos, i: 0 })}
+              transition={{ duration: 0.7, ease: EASE }}
+              className={cn(
+                "relative overflow-hidden rounded-2xl bg-white/5",
+                abierto && fotos.length > 1 && !reduce ? "cursor-none" : "cursor-pointer"
+              )}
+              style={{ flex: abierto ? 7 : 1 }}
+            >
+              <Pase fotos={fotos} abierto={abierto} />
+              <div
+                className={`absolute inset-0 transition-colors duration-700 ${
+                  abierto ? "bg-gradient-to-t from-black/85 via-black/15 to-black/30" : "bg-black/50 hover:bg-black/35"
+                }`}
+              />
+              {/* Sombra a la izquierda para leer el texto sobre fotos claras */}
+              <div
+                className={`absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-black/55 to-transparent transition-opacity duration-700 ${
+                  abierto ? "opacity-100" : "opacity-0"
+                }`}
+              />
+
+              {/* Cerrado: número arriba y nombre en vertical */}
+              <AnimatePresence>
+                {!abierto && (
+                  <motion.button
+                    type="button"
+                    onClick={() => setActivo(i)}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 flex flex-col items-center justify-between py-8"
+                    aria-label={`Ver ${paquete.nombre}`}
+                  >
+                    <span className="text-xs tabular-nums text-white/60">{numero}</span>
+                    <span className="whitespace-nowrap font-display text-2xl [writing-mode:vertical-rl] rotate-180">
+                      {paquete.nombre}
+                    </span>
+                  </motion.button>
+                )}
+              </AnimatePresence>
+
+              {/* Abierto: detalle (los botones no abren el visor por clic en el panel) */}
+              <AnimatePresence>
+                {abierto && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0, transition: { delay: 0.25, duration: 0.6, ease: EASE } }}
+                    exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                    onClick={(e) => e.stopPropagation()}
+                    data-texto
+                    className="absolute bottom-0 left-0 max-w-xl cursor-auto p-10"
+                  >
+                    <p className="text-sm tabular-nums text-white/60">
+                      {numero} <span className="text-white/35">/ {total}</span>
+                    </p>
+                    <h3 className="mt-3 text-6xl leading-none xl:text-7xl">{paquete.nombre}</h3>
+                    <p className="antetitulo mt-5 text-white/75">{precio}</p>
+                    <p className="mt-4 max-w-md leading-relaxed text-white/85">{paquete.descripcion}</p>
+                    <Combos combos={combos} />
+                    <div className="mt-7 flex flex-wrap gap-3">
+                      <Cotizar paquete={paquete} />
+                      <VerFotos n={fotos.length} onClick={() => setVisor({ fotos, i: 0 })} />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {abierto && fotos.length > 1 && <CursorVer x={sx} y={sy} visible={cursor} />}
+            </motion.div>
+          );
+        })}
+      </FadeUp>
+
+      {/* Móvil y tableta: carrusel de tarjetas */}
+      <ul className="mt-12 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-4 [scrollbar-width:none] sm:px-8 lg:hidden">
+        {paquetes.map(({ paquete, combos, fotos, precio }, i) => (
+          <li
+            key={paquete.id}
+            className="relative h-[min(78svh,600px)] min-h-[500px] w-[85vw] max-w-sm shrink-0 snap-center overflow-hidden rounded-2xl bg-white/5"
+          >
+            <Pase fotos={fotos} abierto={false} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/95 from-15% via-black/55 via-55% to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-6">
+              <p className="text-sm tabular-nums text-white/60">
+                {String(i + 1).padStart(2, "0")} <span className="text-white/35">/ {total}</span>
+              </p>
+              <h3 className="mt-2 text-4xl leading-none">{paquete.nombre}</h3>
+              <p className="antetitulo mt-3 text-white/75">{precio}</p>
+              <p className="mt-3 leading-relaxed text-white/85">{paquete.descripcion}</p>
+              <Combos combos={combos} />
+              <div className="mt-5 flex flex-wrap gap-2">
+                <Cotizar paquete={paquete} />
+                <VerFotos n={fotos.length} onClick={() => setVisor({ fotos, i: 0 })} />
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {visor && (
+        <Lightbox photos={visor.fotos} index={visor.i} onChange={(i) => setVisor({ ...visor, i })} onClose={() => setVisor(null)} />
+      )}
     </section>
   );
 }
