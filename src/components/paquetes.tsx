@@ -9,6 +9,7 @@ import { FadeUp, RevealText } from "@/components/motion";
 import { Lightbox, type LightboxPhoto } from "@/components/lightbox";
 import { conRelleno, fotosDeGaleria } from "@/lib/fotos";
 import { cn } from "@/lib/utils";
+import { IconoWhatsapp } from "@/components/whatsapp";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 /** Fotos que pasan en el panel abierto, y cada cuánto cambian. */
@@ -54,8 +55,11 @@ function Cotizar({ paquete }: { paquete: Paquete }) {
       }}
       className="group inline-flex h-12 items-center gap-2 rounded-full bg-white pl-6 pr-4 text-sm font-medium text-tinta transition-colors hover:bg-white/85"
     >
+      {wa && <IconoWhatsapp />}
       Cotizar {paquete.nombre}
-      <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
+      {!wa && (
+        <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
+      )}
     </a>
   );
 }

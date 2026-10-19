@@ -8,6 +8,7 @@ import { Paquetes } from "@/components/paquetes";
 import { Proceso } from "@/components/proceso";
 import { ZoomParallax } from "@/components/zoom-parallax";
 import { ContactoFooter } from "@/components/contacto-footer";
+import { BotonWhatsapp } from "@/components/whatsapp";
 
 /** React pinta después de que el navegador busca el ancla: enlaces como /#paquetes deben bajar igual. */
 function useInitialHashScroll() {
@@ -66,6 +67,7 @@ export default function App() {
         <Proceso />
       </main>
       <ContactoFooter />
+      <BotonWhatsapp />
     </>
   );
 }

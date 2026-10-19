@@ -4,10 +4,13 @@ import siteConfig from "@/content/site.json";
 import { COTIZAR_EVENT, whatsappUrl } from "@/lib/contact";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { IconoWhatsapp } from "@/components/whatsapp";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
 const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY ?? "";
+/** Sin Web3Forms, la cotización sale por WhatsApp si el estudio tiene número. */
+const POR_WHATSAPP = !WEB3FORMS_KEY && Boolean(whatsappUrl(""));
 
 /** Sin Web3Forms configurado, la cotización sale redactada por WhatsApp o, en último caso, por correo. */
 function enviarSinBackend(data: FormData): void {
@@ -157,10 +160,16 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="inline-flex h-12 w-full items-center justify-center rounded-full bg-foreground font-medium text-background transition-colors hover:bg-foreground/85 disabled:opacity-60"
+        className={`inline-flex h-12 w-full items-center justify-center gap-2 rounded-full font-medium transition-colors disabled:opacity-60 ${
+          POR_WHATSAPP ? "bg-[#25D366] text-tinta hover:bg-[#1fb857]" : "bg-foreground text-background hover:bg-foreground/85"
+        }`}
       >
-        {status === "sending" ? "Enviando…" : "Pedir cotización"}
+        {POR_WHATSAPP && <IconoWhatsapp className="size-5" />}
+        {status === "sending" ? "Enviando…" : POR_WHATSAPP ? "Enviar por WhatsApp" : "Pedir cotización"}
       </button>
+      {POR_WHATSAPP && (
+        <p className="text-center text-sm text-muted-foreground">Se abre WhatsApp con tu mensaje ya escrito; solo tienes que enviarlo.</p>
+      )}
 
       {status === "error" && (
         <p className="text-sm text-destructive" role="alert">

@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import siteConfig from "@/content/site.json";
 import { cotizarHref, instagramUrl, telefonoUrl, whatsappUrl } from "@/lib/contact";
 import { Isotipo } from "@/components/logo";
+import { IconoWhatsapp } from "@/components/whatsapp";
 import { useHeroOscuro } from "@/components/heroes/usos";
 import { cn } from "@/lib/utils";
 
@@ -128,8 +129,11 @@ export function Navbar() {
                 oscuro ? "bg-white text-tinta hover:bg-white/85" : "bg-foreground text-background hover:bg-foreground/85"
               )}
             >
+                {whatsapp && <IconoWhatsapp />}
               Cotizar
-              <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
+              {!whatsapp && (
+                <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
+              )}
             </a>
           </div>
 
@@ -198,8 +202,9 @@ export function Navbar() {
                 onClick={() => setOpen(false)}
                 className="flex h-13 items-center justify-center gap-2 rounded-full bg-white font-medium text-tinta"
               >
+                {whatsapp ? <IconoWhatsapp className="size-5" /> : null}
                 {whatsapp ? "Cotizar por WhatsApp" : "Pedir cotización"}
-                <ArrowUpRight className="size-4" aria-hidden />
+                {!whatsapp && <ArrowUpRight className="size-4" aria-hidden />}
               </a>
               <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm text-white/80">
                 {telefono && (

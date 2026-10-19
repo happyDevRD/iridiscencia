@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import siteConfig from "@/content/site.json";
 import { cotizarHref, whatsappUrl } from "@/lib/contact";
 import { FadeUp, RevealText } from "@/components/motion";
+import { IconoWhatsapp } from "@/components/whatsapp";
 import { cn } from "@/lib/utils";
 
 // ── Texto del hero ─────────────────────────────────────────────────────────────
@@ -51,11 +52,14 @@ export function HeroTexto({
               oscuro ? "bg-white text-tinta hover:bg-white/85" : "bg-foreground text-background hover:bg-foreground/85"
             )}
           >
+            {whatsapp && <IconoWhatsapp className="size-5" />}
             {whatsapp ? "Cotizar por WhatsApp" : "Pedir cotización"}
-            <ArrowUpRight
-              className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-              aria-hidden
-            />
+            {!whatsapp && (
+              <ArrowUpRight
+                className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            )}
           </a>
           <a
             href="#trabajo"

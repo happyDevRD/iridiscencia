@@ -1,4 +1,6 @@
-import { AtSign, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import type { ComponentType } from "react";
+import { AtSign, Mail, MapPin, Phone } from "lucide-react";
+import { IconoWhatsapp } from "@/components/whatsapp";
 import { motion, useReducedMotion } from "motion/react";
 import siteConfig from "@/content/site.json";
 import { ContactForm } from "@/components/contact-form";
@@ -10,12 +12,20 @@ export function ContactoFooter() {
   const { contacto } = siteConfig;
   const whatsapp = whatsappUrl("Hola, quiero cotizar una sesión con Iridiscencia.");
   const instagram = instagramUrl();
-  const telefono = telefonoUrl();
+  // Si el teléfono es el mismo número del WhatsApp, basta con una fila
+  const mismoNumero = contacto.telefono.replace(/\D/g, "") === contacto.whatsapp.replace(/\D/g, "");
+  const telefono = whatsapp && mismoNumero ? null : telefonoUrl();
   const mapa = mapaUrl();
   const reduce = useReducedMotion();
 
   const canales = [
-    whatsapp && { href: whatsapp, icon: MessageCircle, label: "WhatsApp", value: contacto.whatsapp, external: true },
+    whatsapp && {
+      href: whatsapp,
+      icon: IconoWhatsapp,
+      label: mismoNumero ? "WhatsApp y llamadas" : "WhatsApp",
+      value: contacto.whatsapp,
+      external: true,
+    },
     instagram && {
       href: instagram,
       icon: AtSign,
@@ -25,7 +35,7 @@ export function ContactoFooter() {
     },
     telefono && { href: telefono, icon: Phone, label: "Teléfono", value: contacto.telefono, external: false },
     { href: `mailto:${contacto.email}`, icon: Mail, label: "Correo", value: contacto.email, external: false },
-  ].filter(Boolean) as { href: string; icon: typeof Mail; label: string; value: string; external: boolean }[];
+  ].filter(Boolean) as { href: string; icon: ComponentType<{ className?: string }>; label: string; value: string; external: boolean }[];
 
   return (
     <footer id="contacto" data-parada="inicio" className="bg-card">
