@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import siteConfig from "@/content/site.json";
 import { HeroTexto } from "./compartido";
 import { useFotosHero, useTonoHero } from "./usos";
 
@@ -76,13 +77,23 @@ export function HeroMuro() {
         </motion.div>
       </div>
 
-      {/* Sombra para leer el titular sin tapar el muro */}
+      {/* Sombra para leer el titular: más densa en el centro, sin apagar del todo el muro */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgb(0_0_0/0.72),rgb(0_0_0/0.35)_70%,rgb(0_0_0/0.55))]"
+        className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgb(0_0_0/0.82),rgb(0_0_0/0.58)_70%,rgb(0_0_0/0.68))]"
       />
 
       <HeroTexto oscuro centrado className="relative z-10 max-w-5xl px-5" />
+
+      {/* Firma del estudio: abajo a la derecha en escritorio, centrada abajo en el móvil */}
+      <motion.p
+        initial={reduce ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 1.1 }}
+        className="antetitulo absolute inset-x-0 bottom-6 z-10 text-center text-[0.65rem] text-white/70 sm:text-xs lg:inset-x-auto lg:bottom-10 lg:right-12 lg:text-right"
+      >
+        Estudio de fotografía · {siteConfig.ubicacion.split(",")[0]}
+      </motion.p>
     </section>
   );
 }

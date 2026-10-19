@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 // ── Texto del hero ─────────────────────────────────────────────────────────────
 
-/** Titular, bajada y botones; `oscuro` = texto blanco sobre fotos. */
+/** Eslogan, bajada y botones; `oscuro` = texto blanco sobre fotos. */
 export function HeroTexto({
   oscuro = false,
   centrado = false,
@@ -20,17 +20,12 @@ export function HeroTexto({
   const whatsapp = whatsappUrl("Hola, quiero cotizar una sesión con Iridiscencia.");
   return (
     <div className={cn(centrado && "mx-auto text-center", className)}>
-      <FadeUp>
-        <p className={cn("antetitulo", oscuro ? "text-white/75" : "text-muted-foreground")}>
-          Estudio de fotografía · {siteConfig.ubicacion.split(",")[0]}
-        </p>
-      </FadeUp>
       <RevealText
         as="h1"
-        text="Fotografía que captura lo irrepetible"
-        italic={[4]}
+        text={siteConfig.eslogan}
+        italic={[siteConfig.eslogan.split(" ").length - 1]}
         delay={0.1}
-        className={cn("mt-6 text-[clamp(3rem,7vw,7.5rem)] leading-[0.98]", oscuro && "text-white")}
+        className={cn("text-[clamp(3rem,7vw,7.5rem)] leading-[0.98]", oscuro && "text-white")}
       />
       <FadeUp delay={0.5}>
         <p

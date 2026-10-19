@@ -33,7 +33,7 @@ Diseños descartados por el cliente: oscuro con nombre iridiscente e intro de di
 
 - [x] **Contacto (2026-10-19):** teléfono +1 849-631-8221, correo iridiscenciaf@gmail.com y dirección (Plaza Dora, calle Porvenir) en `src/content/site.json`; logo oficial en `public/logo.png` e `isotipo.png` (componente `src/components/logo.tsx`, se pinta con `currentColor`) y favicons.
 - [x] **WhatsApp (2026-10-19):** mismo número que el teléfono. Botón flotante (`src/components/whatsapp.tsx`), icono en los botones de cotizar y el formulario envía por WhatsApp mientras no haya Web3Forms.
-- [ ] **Instagram:** falta el usuario en `site.json`.
+- [x] **Instagram (2026-10-19):** @iridiscencia_film.
 - [ ] **Correo propio (opcional):** la web ya usa iridiscenciaf@gmail.com. Para usar `contacto@iridiscencia.com` haría falta Cloudflare Email Routing hacia ese Gmail (el dominio no tiene MX).
 - [ ] **Formulario:** key de Web3Forms (`VITE_WEB3FORMS_KEY` en `.env.local` antes de `deploy-web.sh`).
 - [ ] **Fotos:** no hay de Pre-boda, hay pocas de Bodas y de Eventos, y la portada necesita fotos horizontales.
