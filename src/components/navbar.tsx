@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import siteConfig from "@/content/site.json";
 import { cotizarHref, whatsappUrl } from "@/lib/contact";
+import { useHeroOscuro } from "@/components/heroes/usos";
 
 const links = [
   { href: "#trabajo", label: "Trabajo" },
@@ -18,6 +19,9 @@ export function Navbar() {
   const [hidden, setHidden] = useState(false);
   const { scrollY } = useScroll();
   const whatsapp = whatsappUrl("Hola, quiero cotizar una sesión con Iridiscencia.");
+  // Sobre un hero oscuro y arriba del todo, el menú va en blanco
+  const heroOscuro = useHeroOscuro();
+  const sobreOscuro = heroOscuro && !scrolled && !open;
 
   // Se esconde al bajar y vuelve al subir, para no tapar las fotos.
   useMotionValueEvent(scrollY, "change", (y) => {
@@ -47,7 +51,7 @@ export function Navbar() {
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
         scrolled || open ? "border-b border-border bg-background/85 backdrop-blur-xl" : "border-b border-transparent"
-      }`}
+      } ${sobreOscuro ? "text-white" : ""}`}
     >
       <nav className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-5 sm:px-8">
         <a href="#inicio" className="font-display text-2xl tracking-tight">
@@ -62,7 +66,11 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 aria-current={actual ? "location" : undefined}
-                className="relative rounded-full px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground aria-[current]:text-foreground"
+                className={`relative rounded-full px-4 py-2 text-sm transition-colors ${
+                  sobreOscuro
+                    ? "text-white/80 hover:text-white"
+                    : "text-muted-foreground hover:text-foreground aria-[current]:text-foreground"
+                }`}
               >
                 {actual && (
                   <motion.span layoutId="nav-activo" className="absolute inset-0 rounded-full bg-card" transition={{ type: "spring", stiffness: 380, damping: 32 }} />
@@ -75,7 +83,9 @@ export function Navbar() {
             href={cotizarHref()}
             target={whatsapp ? "_blank" : undefined}
             rel={whatsapp ? "noopener" : undefined}
-            className="group ml-3 inline-flex h-11 items-center gap-1.5 rounded-full bg-foreground pl-5 pr-4 text-sm font-medium text-background transition-colors hover:bg-foreground/85"
+            className={`group ml-3 inline-flex h-11 items-center gap-1.5 rounded-full pl-5 pr-4 text-sm font-medium transition-colors ${
+              sobreOscuro ? "bg-white text-tinta hover:bg-white/85" : "bg-foreground text-background hover:bg-foreground/85"
+            }`}
           >
             Cotizar
             <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />

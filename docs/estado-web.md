@@ -4,11 +4,11 @@ En producción: commit `1473389`, servido desde el NAS con `nas/deploy-web.sh`. 
 
 ## Diseño actual
 
-Limpio, sobre blanco, con las fotos de protagonistas. Titulares en **Bodoni Moda** y texto en **Hanken Grotesk**. Animaciones con `motion` y scroll suave con `lenis`. Todo respeta `prefers-reduced-motion`.
+Limpio, sobre blanco, con las fotos de protagonistas. Titulares en **Fraunces** y texto en **Manrope** (elegidas el 2026-10-19 frente a Cormorant + Jost y Marcellus + Figtree). Animaciones con `motion` y scroll suave con `lenis`. Todo respeta `prefers-reduced-motion`.
 
 | Sección | Componente | Qué hace |
 |---|---|---|
-| Inicio | `hero.tsx` | Titular que se revela palabra a palabra, collage de 3 fotos con parallax y cinta de servicios |
+| Inicio | `hero.tsx` → `heroes/hero-muro.tsx` | Pantalla completa: muro de fotos del NAS inclinado en 3D, con columnas que corren en sentidos opuestos, siguen al mouse y se acercan con el scroll. Titular centrado en blanco y cinta de servicios. Elegido el 2026-10-19 frente al anillo 3D y la foto dentro de las letras |
 | Galería con zoom | `zoom-parallax.tsx` | 7 fotos que se abren desde el centro al hacer scroll |
 | Trabajo reciente | `proyectos-destacados.tsx` | Galería con filtros por categoría y visor |
 | Sesiones | `paquetes.tsx` | Acordeón de fotos con precios y combos de ProStock; carrusel en móvil |
