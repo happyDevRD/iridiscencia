@@ -44,3 +44,14 @@ export function conRelleno(fotos: Foto[], n: number): Foto[] {
   const usadas = new Set(fotos.map((f) => f.src));
   return [...fotos, ...RELLENO.filter((f) => !usadas.has(f.src))].slice(0, n);
 }
+
+/** Alterna categorías (una foto de cada por vuelta) para que no salgan todas las bodas seguidas. */
+export function intercalar<T extends { categoria: string }>(fotos: T[]): T[] {
+  const grupos = new Map<string, T[]>();
+  for (const f of fotos) grupos.set(f.categoria, [...(grupos.get(f.categoria) ?? []), f]);
+  const out: T[] = [];
+  for (let i = 0; out.length < fotos.length; i++) {
+    for (const g of grupos.values()) if (g[i]) out.push(g[i]);
+  }
+  return out;
+}
