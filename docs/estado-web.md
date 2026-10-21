@@ -1,6 +1,6 @@
 # Estado de la web (iridiscencia.com) — 2026-10-16
 
-En producción: commit `1449edc` (2026-10-21), servido desde el NAS con `nas/deploy-web.sh`. Para volver a la versión anterior: `nas/deploy-web.sh rollback`.
+En producción: commit `f4c1910` (2026-10-21, formulario con horas libres de ProStock), servido desde el NAS con `nas/deploy-web.sh`. Para volver a la versión anterior: `nas/deploy-web.sh rollback`.
 
 ## Diseño actual
 
