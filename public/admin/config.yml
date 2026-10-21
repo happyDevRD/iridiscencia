@@ -36,6 +36,15 @@ collections:
               - { label: "Teléfono", name: "telefono", widget: "string", required: false }
               - { label: "Instagram", name: "instagram", widget: "string", required: false }
               - { label: "Dirección", name: "direccion", widget: "string", required: false }
+          - label: "Agenda de reservas"
+            name: "agenda"
+            widget: "object"
+            hint: "Horarios que ofrece el formulario de la web. Las horas ocupadas salen de ProStock."
+            fields:
+              - { label: "Abre (HH:MM)", name: "apertura", widget: "string", default: "08:00" }
+              - { label: "Cierra (HH:MM)", name: "cierre", widget: "string", default: "18:00", hint: "La sesión debe terminar a esta hora o antes." }
+              - { label: "Anticipación mínima (horas)", name: "anticipacionHoras", widget: "number", value_type: "int", default: 24 }
+              - { label: "Reservar hasta (días)", name: "diasMaximos", widget: "number", value_type: "int", default: 180 }
 
   - name: "paquetes"
     label: "Paquetes"
@@ -54,3 +63,5 @@ collections:
               - { label: "Descripción", name: "descripcion", widget: "text" }
               - { label: "Precio desde", name: "precioDesde", widget: "string", hint: "Solo se usa si el paquete no tiene combos en ProStock." }
               - { label: "Prefijos de SKU en ProStock", name: "prefijosSku", widget: "list", required: false, hint: "Ej. SES-BOD. Los combos cuyo SKU empieza así se muestran con su precio real." }
+              - { label: "Ocupa el día completo", name: "diaCompleto", widget: "boolean", default: false, hint: "Bodas, XV… La web aparta todo el día y no pide hora." }
+              - { label: "Duración de la sesión (minutos)", name: "duracionMinutos", widget: "number", value_type: "int", default: 60, required: false, hint: "30 = horarios cada media hora; 60, 120… = cada hora." }

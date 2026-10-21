@@ -56,6 +56,10 @@ export default defineConfig({
         target: process.env.SELECTION_API_TARGET ?? "http://localhost:8181",
         rewrite: () => "/api/public/booking-requests",
       },
+      "/api/disponibilidad": {
+        target: process.env.SELECTION_API_TARGET ?? "http://localhost:8181",
+        rewrite: (p) => p.replace(/^\/api\/disponibilidad/, "/api/public/booking-requests/availability"),
+      },
       "/api/seleccion": {
         target: process.env.SELECTION_API_TARGET ?? "http://localhost:8181",
         rewrite: (p) => p.replace(/^\/api\/seleccion/, "/api/public/selection"),

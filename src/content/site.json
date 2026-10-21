@@ -31,5 +31,11 @@
       "alt": "Pareja caminando por una colina con montañas al fondo",
       "foco": "52% 70%"
     }
-  ]
+  ],
+  "agenda": {
+    "apertura": "08:00",
+    "cierre": "18:00",
+    "anticipacionHoras": 24,
+    "diasMaximos": 180
+  }
 }

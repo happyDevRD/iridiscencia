@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import paquetesData from "@/content/paquetes.json";
 import siteConfig from "@/content/site.json";
 import { COTIZAR_EVENT, whatsappUrl } from "@/lib/contact";
+import { type Horario, horariosLibres, limitesFecha, ocupadosDel, reglaDe } from "@/lib/agenda";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { IconoWhatsapp } from "@/components/whatsapp";
@@ -15,10 +16,11 @@ const POR_WHATSAPP = !WEB3FORMS_KEY && Boolean(whatsappUrl(""));
 /**
  * Registra la solicitud en ProStock (bandeja "Solicitudes web" del estudio) y devuelve su
  * referencia (S-0012). Si ProStock no responde a tiempo, sigue sin ella: la reserva no se pierde
- * porque el mensaje igual sale por WhatsApp o correo.
+ * porque el mensaje igual sale por WhatsApp o correo. "ocupado" = alguien tomó esa hora antes.
  */
-async function registrarSolicitud(data: FormData): Promise<string | null> {
+async function registrarSolicitud(data: FormData): Promise<string | null | "ocupado"> {
   const campo = (k: string) => String(data.get(k) ?? "").trim();
+  const regla = reglaDe(campo("tipo_evento"));
   try {
     const res = await fetch("/api/solicitudes", {
       method: "POST",
@@ -32,8 +34,12 @@ async function registrarSolicitud(data: FormData): Promise<string | null> {
         fecha: campo("fecha") || null,
         mensaje: campo("mensaje") || null,
         website: data.get("botcheck") ? "1" : null,
+        hora: campo("hora") || null,
+        duracionMinutos: regla && !regla.diaCompleto && campo("hora") ? regla.duracion : null,
+        diaCompleto: regla?.diaCompleto && campo("fecha") ? true : null,
       }),
     });
+    if (res.status === 409) return "ocupado";
     if (!res.ok) return null;
     const json = (await res.json()) as { code?: string };
     return json.code ?? null;
@@ -51,7 +57,7 @@ function enviarSinBackend(data: FormData, referencia: string | null, ventana: Wi
   const campo = (k: string) => String(data.get(k) ?? "").trim();
   const texto = [
     `Hola, soy ${campo("nombre")}. Quiero cotizar: ${campo("tipo_evento")}.`,
-    campo("fecha") && `Fecha: ${campo("fecha")}.`,
+    campo("fecha") && `Fecha: ${campo("fecha")}${campo("hora") ? ` a las ${campo("hora")}` : ""}.`,
     campo("mensaje"),
     `Mi teléfono: ${campo("telefono")}${campo("email") ? ` · ${campo("email")}` : ""}`,
     referencia && `Solicitud ${referencia}`,
@@ -90,7 +96,39 @@ export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [tipo, setTipo] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [fecha, setFecha] = useState("");
+  const [hora, setHora] = useState("");
+  // null = cargando o sin fecha; "sin-conexion" = ProStock no respondió (se envía sin hora)
+  const [horarios, setHorarios] = useState<Horario[] | "sin-conexion" | null>(null);
+  const [aviso, setAviso] = useState("");
+  const [recarga, setRecarga] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
+  const regla = reglaDe(tipo);
+  const limites = limitesFecha();
+
+  // Horarios libres del día elegido según la duración del paquete
+  useEffect(() => {
+    setHora("");
+    if (!fecha || !regla) {
+      setHorarios(null);
+      return;
+    }
+    let vigente = true;
+    setHorarios(null);
+    void ocupadosDel(fecha).then((ocupados) => {
+      if (!vigente) return;
+      setHorarios(ocupados === null ? "sin-conexion" : horariosLibres(fecha, regla, ocupados));
+    });
+    return () => {
+      vigente = false;
+    };
+    // regla se deriva de tipo
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fecha, tipo, recarga]);
+
+  const pideHora = Boolean(regla && fecha && Array.isArray(horarios));
+  const faltaHora = pideHora && (horarios as Horario[]).length > 0 && !regla?.diaCompleto && !hora;
+  const diaSinCupo = pideHora && (horarios as Horario[]).length === 0;
 
   // La hoja de pedido, sin WhatsApp configurado, trae aquí las sesiones marcadas.
   useEffect(() => {
@@ -103,23 +141,51 @@ export function ContactForm() {
     return () => window.removeEventListener(COTIZAR_EVENT, handleCotizar);
   }, []);
 
+  function limpiar(form: HTMLFormElement) {
+    form.reset();
+    setTipo("");
+    setMensaje("");
+    setFecha("");
+    setHora("");
+    setAviso("");
+  }
+
+  /** Otra persona tomó la hora mientras llenaba el formulario: se recargan los horarios. */
+  function horaTomada() {
+    setStatus("idle");
+    setHora("");
+    setAviso("Esa hora se acaba de ocupar. Elige otra, por favor.");
+    setRecarga((n) => n + 1);
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
+    if (faltaHora || diaSinCupo) return;
     setStatus("sending");
+    setAviso("");
 
     const formData = new FormData(form);
     if (!WEB3FORMS_KEY) {
       const ventana = whatsappUrl("") ? window.open("", "_blank") : null;
       if (ventana) ventana.opener = null;
-      enviarSinBackend(formData, await registrarSolicitud(formData), ventana);
-      form.reset();
-      setTipo("");
-      setMensaje("");
+      const registro = await registrarSolicitud(formData);
+      if (registro === "ocupado") {
+        ventana?.close();
+        horaTomada();
+        return;
+      }
+      enviarSinBackend(formData, registro, ventana);
+      limpiar(form);
       setStatus("sent");
       return;
     }
-    const referencia = await registrarSolicitud(formData);
+    const registro = await registrarSolicitud(formData);
+    if (registro === "ocupado") {
+      horaTomada();
+      return;
+    }
+    const referencia = registro;
     formData.append("access_key", WEB3FORMS_KEY);
     formData.append(
       "subject",
@@ -131,9 +197,7 @@ export function ContactForm() {
       const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData });
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
-      form.reset();
-      setTipo("");
-      setMensaje("");
+      limpiar(form);
       setStatus("sent");
     } catch {
       setStatus("error");
@@ -192,9 +256,71 @@ export function ContactForm() {
           )}
         </Field>
         <Field label="Fecha del evento" hint="si ya la tienes">
-          {(id) => <Input id={id} name="fecha" type="date"  />}
+          {(id) => (
+            <Input
+              id={id}
+              name="fecha"
+              type="date"
+              min={limites.min}
+              max={limites.max}
+              value={fecha}
+              onChange={(e) => setFecha(e.target.value)}
+            />
+          )}
         </Field>
       </div>
+
+      {regla && fecha && (
+        <div aria-live="polite">
+          <input type="hidden" name="hora" value={regla.diaCompleto ? "" : hora} />
+          {horarios === null ? (
+            <p className="text-sm text-muted-foreground">Buscando horarios disponibles…</p>
+          ) : horarios === "sin-conexion" ? (
+            <p className="text-sm text-muted-foreground">
+              No pudimos consultar la agenda ahora; envía tu solicitud y te confirmamos la hora.
+            </p>
+          ) : regla.diaCompleto ? (
+            <p className={`text-sm ${horarios.length ? "text-foreground" : "text-destructive"}`}>
+              {horarios.length
+                ? "Ese día está disponible: lo apartamos completo para tu evento."
+                : "Ese día ya está reservado. Elige otra fecha, por favor."}
+            </p>
+          ) : horarios.length === 0 ? (
+            <p className="text-sm text-destructive">No quedan horarios ese día. Elige otra fecha, por favor.</p>
+          ) : (
+            <fieldset>
+              <legend className="mb-2 block text-sm font-medium">
+                Hora de la sesión{" "}
+                <span className="text-muted-foreground">
+                  ({regla.duracion < 60 ? `${regla.duracion} min` : `${regla.duracion / 60} h`} aprox.)
+                </span>
+              </legend>
+              <div className="flex flex-wrap gap-2">
+                {horarios.map((h) => (
+                  <button
+                    key={h.hora}
+                    type="button"
+                    aria-pressed={hora === h.hora}
+                    onClick={() => setHora(h.hora)}
+                    className={`h-10 rounded-full border px-4 text-sm transition-colors ${
+                      hora === h.hora
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border bg-card text-foreground hover:border-foreground/60"
+                    }`}
+                  >
+                    {h.etiqueta}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          )}
+          {aviso && (
+            <p className="mt-2 text-sm text-destructive" role="alert">
+              {aviso}
+            </p>
+          )}
+        </div>
+      )}
 
       <Field label="Cuéntanos del evento" hint="lugar, cantidad de horas, ideas">
         {(id) => <Textarea id={id} name="mensaje" rows={4} value={mensaje} onChange={(e) => setMensaje(e.target.value)} />}
@@ -202,7 +328,7 @@ export function ContactForm() {
 
       <button
         type="submit"
-        disabled={status === "sending"}
+        disabled={status === "sending" || faltaHora || diaSinCupo}
         className={`inline-flex h-12 w-full items-center justify-center gap-2 rounded-full font-medium transition-colors disabled:opacity-60 ${
           POR_WHATSAPP ? "bg-[#25D366] text-tinta hover:bg-[#1fb857]" : "bg-foreground text-background hover:bg-foreground/85"
         }`}

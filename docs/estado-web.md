@@ -13,7 +13,7 @@ Limpio, sobre blanco, con las fotos de protagonistas. Titulares en **Fraunces** 
 | Trabajo reciente | `proyectos-destacados.tsx` | Galería con filtros por categoría y visor |
 | Sesiones | `paquetes.tsx` | Acordeón de fotos con precios y combos de ProStock; carrusel en móvil |
 | Cómo trabajamos | `proceso.tsx` | 4 pasos |
-| Contacto | `contacto-footer.tsx` | Formulario y canales, con el nombre del estudio a todo el ancho |
+| Contacto | `contacto-footer.tsx` | Formulario y canales, con el nombre del estudio a todo el ancho. Al elegir sesión y fecha ofrece solo las horas libres de la agenda de ProStock (`src/lib/agenda.ts`, `/api/disponibilidad`): cada 30 min para sesiones de media hora, cada hora para las demás; bodas y XV apartan el día completo. Duración por paquete y horario del estudio se editan en el CMS |
 | Portal de clientes | `seleccion/SelectionApp.tsx` | `iridiscencia.com/seleccion/<token>`, para que el cliente elija sus fotos |
 
 **Scroll guiado** (`src/lib/paradas.ts`, sobre Lenis): si el scroll se detiene cerca del inicio de una sección marcada con `data-parada`, termina de llevarte a ella (30% de pantalla de margen; 45% en Sesiones, con `data-parada-fuerte`). Lejos de una parada el scroll es libre. Sesiones ocupa exactamente una pantalla para verse siempre entera; en pantallas bajas oculta la lista de combos.
