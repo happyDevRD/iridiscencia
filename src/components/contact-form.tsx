@@ -37,6 +37,7 @@ async function registrarSolicitud(data: FormData): Promise<string | null | "ocup
         hora: campo("hora") || null,
         duracionMinutos: regla && !regla.diaCompleto && campo("hora") ? regla.duracion : null,
         diaCompleto: regla?.diaCompleto && campo("fecha") ? true : null,
+        avisosWhatsapp: data.get("avisos_whatsapp") === "si",
       }),
     });
     if (res.status === 409) return "ocupado";
@@ -325,6 +326,15 @@ export function ContactForm() {
       <Field label="Cuéntanos del evento" hint="lugar, cantidad de horas, ideas">
         {(id) => <Textarea id={id} name="mensaje" rows={4} value={mensaje} onChange={(e) => setMensaje(e.target.value)} />}
       </Field>
+
+      {/* Consentimiento para los avisos automáticos de ProStock (Meta lo exige); sin marcar por defecto */}
+      <label className="flex items-start gap-3 text-sm text-muted-foreground">
+        <input type="checkbox" name="avisos_whatsapp" value="si" className="mt-0.5 size-4 shrink-0 accent-foreground" />
+        <span>
+          Acepto recibir por WhatsApp avisos de mi reserva: confirmación de la cita, recordatorio y cuando mis fotos
+          estén listas. Llegan desde el <span className="whitespace-nowrap">+1 829-546-8012</span>.
+        </span>
+      </label>
 
       <button
         type="submit"
