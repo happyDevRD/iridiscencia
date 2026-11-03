@@ -6,7 +6,6 @@ import { Hero } from "@/components/hero";
 import { ProyectosDestacados } from "@/components/proyectos-destacados";
 import { Paquetes } from "@/components/paquetes";
 import { Proceso } from "@/components/proceso";
-import { Manifiesto } from "@/components/manifiesto";
 import { ContactoFooter } from "@/components/contacto-footer";
 import { BotonWhatsapp } from "@/components/whatsapp";
 
@@ -61,7 +60,6 @@ export default function App() {
       <Navbar />
       <main>
         <Hero />
-        <Manifiesto />
         <ProyectosDestacados />
         <Paquetes />
         <Proceso />
