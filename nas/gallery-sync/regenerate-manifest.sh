@@ -2,6 +2,7 @@
 # Regenera /galeria/manifest.json a partir de las carpetas de /volume1/Galeria.
 #
 # Convenciones (explicadas al staff en LEEME.txt):
+#   "_DSC0001.jpg"     los archivos con "_" delante SÍ se publican (solo las carpetas "_" se ignoran)
 #   "01 Bodas/"        categoría; el número solo ordena y no se muestra ("Bodas")
 #   "00 Portada/"      fotos del inicio de la web (no es categoría)
 #   "_Sin publicar/"   todo lo que empieza por "_" o "@" se ignora
@@ -39,7 +40,8 @@ fotos_de() {
   for foto in "$dir"/*.jpg "$dir"/*.jpeg "$dir"/*.png; do
     [ -f "$foto" ] || continue
     fname=$(basename "$foto")
-    case "$fname" in _*|.*) continue ;; esac
+    # Solo se ocultan archivos ocultos. Los de "_" sí se publican: la cámara Sony nombra "_DSC0001.jpg".
+    case "$fname" in .*) continue ;; esac
     base="${fname%.*}.jpg"
     thumb="$dir/_thumbs/$base"
     web="$dir/_web/$base"
