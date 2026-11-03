@@ -6,7 +6,7 @@ import { Hero } from "@/components/hero";
 import { ProyectosDestacados } from "@/components/proyectos-destacados";
 import { Paquetes } from "@/components/paquetes";
 import { Proceso } from "@/components/proceso";
-import { FraseFotos } from "@/components/frase-fotos";
+import { CintaFotos } from "@/components/cinta-fotos";
 import { ContactoFooter } from "@/components/contacto-footer";
 import { BotonWhatsapp } from "@/components/whatsapp";
 
@@ -61,7 +61,7 @@ export default function App() {
       <Navbar />
       <main>
         <Hero />
-        <FraseFotos />
+        <CintaFotos />
         <ProyectosDestacados />
         <Paquetes />
         <Proceso />

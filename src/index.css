@@ -111,6 +111,12 @@
   animation: marquee 38s linear infinite;
 }
 
+/* Cintas de fotos (sección tras el hero); la mitad de la pista = una vuelta completa. */
+.marquee-fotos {
+  animation: marquee 70s linear infinite;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
