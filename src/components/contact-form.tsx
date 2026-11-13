@@ -6,9 +6,22 @@ import { type Horario, horariosLibres, limitesFecha, ocupadosDel, reglaDe } from
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { IconoWhatsapp } from "@/components/whatsapp";
-import { cuposRestantes, navidad, paqueteNavidadDe, textoDescuento, TIPOS_NAVIDAD } from "@/lib/navidad";
+import { cuposRestantes, navidad, paqueteNavidadDe, precioConDescuento, textoDescuento, TIPOS_NAVIDAD } from "@/lib/navidad";
 
 type Status = "idle" | "sending" | "sent" | "error";
+
+/**
+ * Marca de la oferta de Navidad: va en el mensaje que llega a ProStock y por WhatsApp, para que
+ * el estudio vea de un vistazo que la reserva vino de la web y con qué precio aplica.
+ */
+function notaOferta(tipo: string): string | null {
+  const p = paqueteNavidadDe(tipo);
+  if (!p || cuposRestantes() <= 0) return null;
+  const rebajado = precioConDescuento(p.precio);
+  return `🎁 OFERTA NAVIDAD WEB (${textoDescuento()}, primeros ${navidad.oferta.cupos}): ${p.nombre}${
+    rebajado !== null ? ` RD$ ${rebajado.toLocaleString("en-US")} (antes RD$ ${p.precio.toLocaleString("en-US")})` : ""
+  }`;
+}
 
 const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY ?? "";
 /** Sin Web3Forms, la cotización sale por WhatsApp si el estudio tiene número. */
@@ -33,7 +46,7 @@ async function registrarSolicitud(data: FormData): Promise<string | null | "ocup
         email: campo("email") || null,
         tipoEvento: campo("tipo_evento") || null,
         fecha: campo("fecha") || null,
-        mensaje: campo("mensaje") || null,
+        mensaje: [notaOferta(campo("tipo_evento")), campo("mensaje")].filter(Boolean).join("\n") || null,
         website: data.get("botcheck") ? "1" : null,
         hora: campo("hora") || null,
         duracionMinutos: regla && !regla.diaCompleto && campo("hora") ? regla.duracion : null,
@@ -59,6 +72,7 @@ function enviarSinBackend(data: FormData, referencia: string | null, ventana: Wi
   const campo = (k: string) => String(data.get(k) ?? "").trim();
   const texto = [
     `Hola, soy ${campo("nombre")}. Quiero cotizar: ${campo("tipo_evento")}.`,
+    notaOferta(campo("tipo_evento")),
     campo("fecha") && `Fecha: ${campo("fecha")}${campo("hora") ? ` a las ${campo("hora")}` : ""}.`,
     campo("mensaje"),
     `Mi teléfono: ${campo("telefono")}${campo("email") ? ` · ${campo("email")}` : ""}`,
