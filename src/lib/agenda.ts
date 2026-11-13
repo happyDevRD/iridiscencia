@@ -3,6 +3,7 @@
 // los horarios que se ofrecen según la duración de cada paquete.
 import paquetesData from "@/content/paquetes.json";
 import siteConfig from "@/content/site.json";
+import { paqueteNavidadDe } from "@/lib/navidad";
 
 export type Ocupado = { start: string; end: string };
 
@@ -10,6 +11,8 @@ export type Ocupado = { start: string; end: string };
 export type ReglaAgenda = { diaCompleto: true } | { diaCompleto: false; duracion: number; paso: number };
 
 export function reglaDe(tipo: string): ReglaAgenda | null {
+  const navidad = paqueteNavidadDe(tipo);
+  if (navidad) return { diaCompleto: false, duracion: navidad.duracionMinutos, paso: 30 };
   const p = paquetesData.paquetes.find((x) => x.nombre === tipo);
   if (!p) return null;
   if (p.diaCompleto) return { diaCompleto: true };

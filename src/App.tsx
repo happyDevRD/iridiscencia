@@ -8,6 +8,8 @@ import { Paquetes } from "@/components/paquetes";
 import { Proceso } from "@/components/proceso";
 import { ContactoFooter } from "@/components/contacto-footer";
 import { BotonWhatsapp } from "@/components/whatsapp";
+import { Navidad } from "@/components/navidad";
+import { NAVIDAD_ACTIVA } from "@/lib/navidad";
 
 /** React pinta después de que el navegador busca el ancla: enlaces como /#paquetes deben bajar igual. */
 function useInitialHashScroll() {
@@ -61,6 +63,7 @@ export default function App() {
       <main>
         <Hero />
         <ProyectosDestacados />
+        {NAVIDAD_ACTIVA && <Navidad />}
         <Paquetes />
         <Proceso />
       </main>

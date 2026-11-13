@@ -6,6 +6,7 @@ import { type Horario, horariosLibres, limitesFecha, ocupadosDel, reglaDe } from
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { IconoWhatsapp } from "@/components/whatsapp";
+import { cuposRestantes, navidad, paqueteNavidadDe, textoDescuento, TIPOS_NAVIDAD } from "@/lib/navidad";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -78,7 +79,7 @@ function enviarSinBackend(data: FormData, referencia: string | null, ventana: Wi
 }
 
 const VARIAS = "Varias sesiones";
-const TIPOS = [...paquetesData.paquetes.map((p) => p.nombre), VARIAS, "Otro"];
+const TIPOS = [...TIPOS_NAVIDAD, ...paquetesData.paquetes.map((p) => p.nombre), VARIAS, "Otro"];
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: (id: string) => React.ReactNode }) {
   const id = useId();
@@ -270,6 +271,13 @@ export function ContactForm() {
           )}
         </Field>
       </div>
+
+      {paqueteNavidadDe(tipo) && cuposRestantes() > 0 && (
+        <p className="rounded-lg border border-[var(--oro)]/50 bg-[var(--oro)]/10 px-4 py-3 text-sm">
+          🎁 Especial de Navidad: los primeros {navidad.oferta.cupos} que reserven desde la web tienen {textoDescuento()}. Te
+          confirmamos tu cupo por WhatsApp.
+        </p>
+      )}
 
       {regla && fecha && (
         <div aria-live="polite">

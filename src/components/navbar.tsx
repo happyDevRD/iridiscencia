@@ -6,10 +6,12 @@ import { cotizarHref, instagramUrl, telefonoUrl, whatsappUrl } from "@/lib/conta
 import { Isotipo } from "@/components/logo";
 import { IconoWhatsapp } from "@/components/whatsapp";
 import { useHeroOscuro } from "@/components/heroes/usos";
+import { NAVIDAD_ACTIVA } from "@/lib/navidad";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const links = [
+  ...(NAVIDAD_ACTIVA ? [{ href: "#navidad", label: "Navidad" }] : []),
   { href: "#trabajo", label: "Trabajo" },
   { href: "#sesiones", label: "Sesiones" },
   { href: "#proceso", label: "Cómo trabajamos" },

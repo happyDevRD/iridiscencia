@@ -6,6 +6,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-display: var(--font-display);
+  --font-script: "Allura", cursive;
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-muted: var(--muted);
@@ -88,6 +89,36 @@
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+}
+
+/* ── Especial de Navidad (content/navidad.json) ─────────────────────────────── */
+:root {
+  --noche: #140c09;
+  --noche-2: #1e120d;
+  --oro: #d8b16a;
+  --oro-claro: #e8c88c;
+  --vino: #7d1d22;
+  --pino: #1f3a2b;
+}
+
+/* Bombillas de la guirnalda: titilan con su propio ritmo */
+@keyframes bombilla {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px 1px #ffd99a, 0 0 18px 4px rgb(255 190 100 / 0.45); }
+  50% { opacity: 0.45; box-shadow: 0 0 2px 0 #ffd99a, 0 0 6px 1px rgb(255 190 100 / 0.15); }
+}
+.bombilla {
+  background: #ffe2a8;
+  animation: bombilla 2.6s ease-in-out infinite;
+}
+
+/* Luces de fondo que respiran despacio */
+@keyframes bokeh {
+  0%, 100% { opacity: 0.22; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.38; transform: translate(-50%, -50%) scale(1.15); }
+}
+.bokeh {
+  animation: bokeh 9s ease-in-out infinite;
+  transform: translate(-50%, -50%);
 }
 
 /* Columnas de fotos del Hero: cada una se desplaza la mitad de su alto (la lista va duplicada) */
