@@ -15,29 +15,67 @@
       "nombre": "Magia Navideña",
       "precio": 4250,
       "duracionMinutos": 30,
-      "incluye": ["4 fotos digitales HD", "30 minutos de sesión", "Sin cambio de ropa"]
+      "incluye": [
+        "4 fotos digitales HD",
+        "30 minutos de sesión",
+        "Sin cambio de ropa"
+      ]
     },
     {
       "id": "tradicion-familiar",
       "nombre": "Tradición Familiar",
       "precio": 7450,
       "duracionMinutos": 45,
-      "incluye": ["10 fotos digitales HD", "45 minutos de sesión", "Con cambio de ropa"],
+      "incluye": [
+        "10 fotos digitales HD",
+        "45 minutos de sesión",
+        "Con cambio de ropa"
+      ],
       "destacado": true
     }
   ],
   "adicionales": [
-    { "nombre": "Foto digital adicional", "precio": 550 },
-    { "nombre": "Cambio de ropa adicional", "precio": 450 }
+    {
+      "nombre": "Foto digital adicional",
+      "precio": 550
+    },
+    {
+      "nombre": "Cambio de ropa adicional",
+      "precio": 450
+    }
   ],
   "fotos": [
-    { "src": "/navidad/set-04.jpg", "alt": "Retrato con un haz de luz frente a la puerta de madera del set navideño" },
-    { "src": "/navidad/set-02.jpg", "alt": "Mujer con vestido vino sentada en el banco verde del set navideño" },
-    { "src": "/navidad/set-06.jpg", "alt": "Tres amigas posando entre los árboles de Navidad" },
-    { "src": "/navidad/set-05.jpg", "alt": "Retrato con luces en movimiento junto al árbol de Navidad" },
-    { "src": "/navidad/set-01.jpg", "alt": "Mujer de pie frente a la puerta de madera con corona navideña" },
-    { "src": "/navidad/set-03.jpg", "alt": "Mujer con vestido rojo sentada en el piso junto a los regalos" },
-    { "src": "/navidad/set-07.jpg", "alt": "Retrato junto al carrito de regalos del set" },
-    { "src": "/navidad/set-08.jpg", "alt": "Vista completa del set navideño con el carrito de regalos" }
+    {
+      "src": "/navidad/nav-01.jpg",
+      "alt": "Retrato con un haz de luz frente a la puerta de madera del set navideño"
+    },
+    {
+      "src": "/navidad/nav-02.jpg",
+      "alt": "Familia con su hija sentados en el banco verde del set navideño"
+    },
+    {
+      "src": "/navidad/nav-03.jpg",
+      "alt": "Tres amigas posando entre los árboles de Navidad"
+    },
+    {
+      "src": "/navidad/nav-04.jpg",
+      "alt": "Retrato con luces en movimiento junto al árbol de Navidad"
+    },
+    {
+      "src": "/navidad/nav-05.jpg",
+      "alt": "Mamá con su niña en el carrito de regalos del set"
+    },
+    {
+      "src": "/navidad/nav-06.jpg",
+      "alt": "Retrato sonriente junto al árbol de Navidad"
+    },
+    {
+      "src": "/navidad/nav-07.jpg",
+      "alt": "Mujer con vestido vino sentada en el banco verde"
+    },
+    {
+      "src": "/navidad/nav-08.jpg",
+      "alt": "Mujer con vestido rojo sentada en el piso junto a los regalos"
+    }
   ]
 }
