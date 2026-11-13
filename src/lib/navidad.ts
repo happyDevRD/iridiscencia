@@ -32,4 +32,11 @@ export function textoDescuento(): string {
 
 export const precio = (n: number) => formatoPrecio(n);
 
+/** Precio con el descuento de la oferta si es un porcentaje («10 %»); null si no hay. */
+export function precioConDescuento(n: number): number | null {
+  const m = navidad.oferta.descuento.match(/(\d+(?:[.,]\d+)?)\s*%/);
+  if (!m) return null;
+  return Math.round((n * (100 - Number(m[1].replace(",", ".")))) / 100);
+}
+
 export { navidad };

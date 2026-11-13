@@ -61,7 +61,7 @@ collections:
               - { label: "Identificador", name: "id", widget: "string" }
               - { label: "Nombre", name: "nombre", widget: "string" }
               - { label: "Descripción", name: "descripcion", widget: "text" }
-              - { label: "Precio desde", name: "precioDesde", widget: "string", hint: "Solo se usa si el paquete no tiene combos en ProStock." }
-              - { label: "Prefijos de SKU en ProStock", name: "prefijosSku", widget: "list", required: false, hint: "Ej. SES-BOD. Los combos cuyo SKU empieza así se muestran con su precio real." }
+              - { label: "Precio desde", name: "precioDesde", widget: "string", hint: "Solo se usa si la sesión no tiene paquetes en ProStock." }
+              - { label: "Prefijos de SKU en ProStock", name: "prefijosSku", widget: "list", required: false, hint: "Ej. SES-BOD. Los paquetes cuyo SKU empieza así se muestran con su precio real." }
               - { label: "Ocupa el día completo", name: "diaCompleto", widget: "boolean", default: false, hint: "Bodas, XV… La web aparta todo el día y no pide hora." }
               - { label: "Duración de la sesión (minutos)", name: "duracionMinutos", widget: "number", value_type: "int", default: 60, required: false, hint: "30 = horarios cada media hora; 60, 120… = cada hora." }

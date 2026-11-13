@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowUpRight, Check, Gift } from "lucide-react";
 import { COTIZAR_EVENT } from "@/lib/contact";
-import { cuposRestantes, navidad, precio, textoDescuento, tipoNavidad, type PaqueteNavidad } from "@/lib/navidad";
+import { cuposRestantes, navidad, precio, precioConDescuento, textoDescuento, tipoNavidad, type PaqueteNavidad } from "@/lib/navidad";
 import { Lightbox, type LightboxPhoto } from "@/components/lightbox";
 import { FadeUp, RevealText } from "@/components/motion";
 import { Cupos } from "@/components/heroes/hero-navidad";
@@ -65,8 +65,20 @@ function TarjetaPaquete({ p, conDescuento }: { p: PaqueteNavidad; conDescuento: 
         </span>
       )}
       <h3 className="font-display text-3xl sm:text-4xl">{p.nombre}</h3>
-      <p className="mt-3 font-display text-4xl tabular-nums text-[var(--oro)]">{precio(p.precio)}</p>
-      {conDescuento && <p className="mt-1 text-sm text-white/60">Con {textoDescuento()} si reservas por la web</p>}
+      {conDescuento && precioConDescuento(p.precio) !== null ? (
+        <>
+          <p className="mt-3 flex items-baseline gap-3">
+            <span className="font-display text-4xl tabular-nums text-[var(--oro)]">{precio(precioConDescuento(p.precio)!)}</span>
+            <s className="tabular-nums text-white/45">{precio(p.precio)}</s>
+          </p>
+          <p className="mt-1 text-sm text-white/60">Con {textoDescuento()} reservando por la web</p>
+        </>
+      ) : (
+        <>
+          <p className="mt-3 font-display text-4xl tabular-nums text-[var(--oro)]">{precio(p.precio)}</p>
+          {conDescuento && <p className="mt-1 text-sm text-white/60">Con {textoDescuento()} si reservas por la web</p>}
+        </>
+      )}
       <ul className="mt-6 space-y-2.5 text-white/85">
         {p.incluye.map((x) => (
           <li key={x} className="flex items-center gap-3">

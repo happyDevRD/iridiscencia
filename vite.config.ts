@@ -5,6 +5,8 @@ import path from "node:path";
 import siteConfig from "./src/content/site.json";
 
 const SITE_URL = "https://iridiscencia.com/";
+/** Dónde se publica esta compilación (la vista previa de WhatsApp necesita la imagen con URL absoluta). */
+const PUBLICADO_EN = (process.env.SITE_URL ?? SITE_URL).replace(/\/?$/, "/");
 
 /** Datos estructurados (Google) generados desde site.json: el contacto vive en un solo sitio. */
 function jsonLd(): string {
@@ -16,7 +18,7 @@ function jsonLd(): string {
     additionalType: "https://schema.org/Photographer",
     name: siteConfig.nombre,
     url: SITE_URL,
-    image: `${SITE_URL}og.jpg`,
+    image: `${SITE_URL}og-logo.jpg`,
     logo: `${SITE_URL}logo.png`,
     description: siteConfig.descripcion,
     email: contacto.email || undefined,
@@ -37,13 +39,15 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    { name: "site-json-ld", transformIndexHtml: (html) => html.replace("<!-- json-ld -->", jsonLd()) },
+    { name: "site-json-ld", transformIndexHtml: (html) => html.replace("<!-- json-ld -->", jsonLd()).replaceAll("%SITE_URL%", PUBLICADO_EN) },
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Vista previa para compartir (cloudflared tunnel): acepta el dominio temporal del túnel.
+  preview: { allowedHosts: [".trycloudflare.com"] },
   server: {
     // En desarrollo, sin VITE_GALLERY_BASE_URL, el catálogo de ProStock
     // y la galería se leen

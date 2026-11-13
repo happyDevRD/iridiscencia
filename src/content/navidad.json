@@ -6,7 +6,7 @@
   "oferta": {
     "cupos": 10,
     "cuposRestantes": 10,
-    "descuento": "",
+    "descuento": "10 %",
     "condicion": "Válido para los primeros 10 que reserven su sesión navideña desde la web."
   },
   "paquetes": [

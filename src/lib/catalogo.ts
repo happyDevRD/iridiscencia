@@ -40,6 +40,9 @@ export async function fetchCatalogo(): Promise<Catalogo | null> {
   }
 }
 
+/** En la web se habla de «paquetes»: «Combo Bodas 1» se muestra como «Paquete Bodas 1». */
+export const nombrePublico = (nombre: string) => nombre.replace(/^combo\b/i, "Paquete");
+
 /** Productos cuyo SKU empieza por alguno de los prefijos, ordenados por precio. */
 export function productosPorPrefijo(catalogo: Catalogo | null, prefijos: string[]): CatalogoProducto[] {
   if (!catalogo || prefijos.length === 0) return [];
@@ -47,6 +50,7 @@ export function productosPorPrefijo(catalogo: Catalogo | null, prefijos: string[
   return catalogo.categorias
     .flatMap((c) => c.productos)
     .filter((p) => upper.some((pre) => p.sku.toUpperCase().startsWith(pre)))
+    .map((p) => ({ ...p, nombre: nombrePublico(p.nombre) }))
     .sort((a, b) => a.precio - b.precio);
 }
 
