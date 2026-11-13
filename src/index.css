@@ -121,6 +121,156 @@
   transform: translate(-50%, -50%);
 }
 
+/* Destellos y copos que caen (posición) y brillan (opacidad) a la vez */
+@keyframes caer {
+  from { transform: translate3d(0, -5vh, 0); }
+  to { transform: translate3d(var(--deriva, 0px), 105vh, 0); }
+}
+@keyframes titilar {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.25; }
+}
+.destello {
+  animation-name: caer, titilar;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.destello-oro {
+  border-radius: 9999px;
+  background: #ffe2a8;
+  box-shadow: 0 0 6px 1px rgb(255 205 120 / 0.8);
+}
+.destello-copo {
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.85);
+  filter: blur(0.5px);
+}
+
+/* La guirnalda se mece y las bolas se balancean desde su gancho */
+@keyframes mecer {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(5px) rotate(0.4deg); }
+}
+.guirnalda {
+  animation: mecer 6s ease-in-out infinite;
+  transform-origin: 50% 0;
+}
+@keyframes balancear {
+  0%, 100% { transform: translateX(-50%) rotate(-7deg); }
+  50% { transform: translateX(-50%) rotate(7deg); }
+}
+.bola {
+  transform-origin: 50% 0;
+  animation: balancear 3.8s ease-in-out infinite;
+}
+
+/* Fotos del abanico: flotan despacio y un reflejo las cruza de vez en cuando */
+@keyframes flotar {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(0.6deg); }
+}
+.flotar {
+  animation: flotar 5.5s ease-in-out infinite;
+}
+@keyframes reflejo {
+  0%, 70% { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(160%) skewX(-18deg); }
+}
+.reflejo {
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.28) 50%, transparent 70%);
+  animation: reflejo 6s ease-in-out infinite;
+}
+
+/* «en casa» en oro con un brillo que lo recorre */
+@keyframes brillo-texto {
+  to { background-position: -200% 0; }
+}
+.brillo-oro {
+  background: linear-gradient(100deg, var(--oro) 0%, var(--oro) 40%, #fff3d6 50%, var(--oro) 60%, var(--oro) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: brillo-texto 4.5s linear infinite;
+  padding-right: 0.15em;
+}
+
+/* Botón principal: un destello lo cruza cada pocos segundos */
+@keyframes barrido {
+  0%, 65% { transform: translateX(-130%) skewX(-20deg); }
+  100% { transform: translateX(260%) skewX(-20deg); }
+}
+.brillo-boton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  animation: barrido 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Borde dorado de la oferta que gira como una luz */
+@property --giro {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes girar-borde {
+  to { --giro: 360deg; }
+}
+.oferta-borde::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(from var(--giro), rgb(216 177 106 / 0.25) 0deg, #ffe2a8 40deg, rgb(216 177 106 / 0.25) 90deg, rgb(216 177 106 / 0.25) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: girar-borde 5s linear infinite;
+  pointer-events: none;
+}
+
+/* Regalo que se sacude de vez en cuando */
+@keyframes sacudir {
+  0%, 80%, 100% { transform: rotate(0deg) scale(1); }
+  84% { transform: rotate(-14deg) scale(1.12); }
+  88% { transform: rotate(12deg) scale(1.12); }
+  92% { transform: rotate(-8deg) scale(1.06); }
+  96% { transform: rotate(4deg); }
+}
+.regalo {
+  animation: sacudir 4s ease-in-out infinite;
+}
+
+/* Cupos: las bombillas laten en cadena */
+@keyframes latir {
+  0%, 100% { box-shadow: 0 0 4px var(--oro); transform: scale(1); }
+  50% { box-shadow: 0 0 12px 2px var(--oro); transform: scale(1.18); }
+}
+.cupo {
+  animation: latir 1.8s ease-in-out infinite;
+}
+
+/* Tira de fotos del set en el móvil: corre sola */
+@keyframes tira {
+  to { transform: translateX(-50%); }
+}
+.tira-set {
+  animation: tira 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .destello,
+  .reflejo,
+  .brillo-boton::after {
+    display: none;
+  }
+}
+
 /* Columnas de fotos del Hero: cada una se desplaza la mitad de su alto (la lista va duplicada) */
 @keyframes hero-columna {
   to {
