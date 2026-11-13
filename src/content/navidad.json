@@ -47,35 +47,35 @@
   "fotos": [
     {
       "src": "/navidad/nav-01.jpg",
-      "alt": "Retrato con un haz de luz frente a la puerta de madera del set navideño"
+      "alt": "Familia con su hija en el banco verde del set navideño"
     },
     {
       "src": "/navidad/nav-02.jpg",
-      "alt": "Familia con su hija sentados en el banco verde del set navideño"
-    },
-    {
-      "src": "/navidad/nav-03.jpg",
       "alt": "Tres amigas posando entre los árboles de Navidad"
     },
     {
-      "src": "/navidad/nav-04.jpg",
-      "alt": "Retrato con luces en movimiento junto al árbol de Navidad"
-    },
-    {
-      "src": "/navidad/nav-05.jpg",
+      "src": "/navidad/nav-03.jpg",
       "alt": "Mamá con su niña en el carrito de regalos del set"
     },
     {
-      "src": "/navidad/nav-06.jpg",
+      "src": "/navidad/nav-04.jpg",
       "alt": "Retrato sonriente junto al árbol de Navidad"
     },
     {
-      "src": "/navidad/nav-07.jpg",
+      "src": "/navidad/nav-05.jpg",
       "alt": "Mujer con vestido vino sentada en el banco verde"
     },
     {
-      "src": "/navidad/nav-08.jpg",
+      "src": "/navidad/nav-06.jpg",
+      "alt": "Mujer con vestido rojo junto al carrito de regalos"
+    },
+    {
+      "src": "/navidad/nav-07.jpg",
       "alt": "Mujer con vestido rojo sentada en el piso junto a los regalos"
+    },
+    {
+      "src": "/navidad/nav-08.jpg",
+      "alt": "Mujer recostada en el banco verde con manto rojo"
     }
   ]
 }
