@@ -14,7 +14,7 @@ Limpio, sobre blanco, con las fotos de protagonistas. Titulares en **Fraunces** 
 | Sesiones | `paquetes.tsx` | Acordeón de fotos con precios y combos de ProStock; carrusel en móvil |
 | Cómo trabajamos | `proceso.tsx` | 4 pasos |
 | Contacto | `contacto-footer.tsx` | Formulario y canales, con el nombre del estudio a todo el ancho. Al elegir sesión y fecha ofrece solo las horas libres de la agenda de ProStock (`src/lib/agenda.ts`, `/api/disponibilidad`): cada 30 min para sesiones de media hora, cada hora para las demás; bodas y XV apartan el día completo. Duración por paquete y horario del estudio se editan en el CMS |
-| Portal de clientes | `seleccion/SelectionApp.tsx` | `iridiscencia.com/seleccion/<token>`, para que el cliente elija sus fotos |
+| Portal de clientes | `seleccion/SelectionApp.tsx` | `iridiscencia.com/seleccion/<usuario>`, para que el cliente elija sus fotos. Entra con usuario + contraseña de 6 dígitos (`LoginScreen.tsx`, sesión de 12 h en `sessionStorage`); el orden de marcado decide qué fotos son del paquete y cuáles adicionales |
 
 **Scroll guiado** (`src/lib/paradas.ts`, sobre Lenis): si el scroll se detiene cerca del inicio de una sección marcada con `data-parada`, termina de llevarte a ella (30% de pantalla de margen; 45% en Sesiones, con `data-parada-fuerte`). Lejos de una parada el scroll es libre. Sesiones ocupa exactamente una pantalla para verse siempre entera; en pantallas bajas oculta la lista de combos.
 
@@ -30,6 +30,8 @@ Diseños descartados por el cliente: oscuro con nombre iridiscente e intro de di
 - El 2026-10-16 se publicaron 135 fotos de `Entregas`, con nombres neutros (`<categoria>-NNNN.jpg`) porque las carpetas originales llevan nombre y teléfono del cliente.
 
 ## Pendiente
+
+- [ ] **Portal con usuario y contraseña (2026-11-18, rama `feat/seleccion-login`, sin desplegar):** `/seleccion[/<usuario>]` con formulario de entrada, insignia «Adicional» para las que pasan del cupo, desglose y aceptación del costo al confirmar, y resumen según `extraStatus`. Desplegar después del backend de ProStock.
 
 - [x] **Contacto (2026-10-19):** teléfono +1 849-631-8221, correo iridiscenciaf@gmail.com y dirección (Plaza Dora, calle Porvenir) en `src/content/site.json`; logo oficial en `public/logo.png` e `isotipo.png` (componente `src/components/logo.tsx`, se pinta con `currentColor`) y favicons.
 - [x] **WhatsApp (2026-10-19):** mismo número que el teléfono. Botón flotante (`src/components/whatsapp.tsx`), icono en los botones de cotizar y el formulario envía por WhatsApp mientras no haya Web3Forms.

@@ -3,9 +3,9 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
 
-// Portal privado de selección de fotos (iridiscencia.com/seleccion/<token>): carga aparte.
+// Portal privado de selección de fotos (iridiscencia.com/seleccion[/<usuario>]): carga aparte.
 const SelectionApp = lazy(() => import("./seleccion/SelectionApp"));
-const isSelection = window.location.pathname.startsWith("/seleccion/");
+const isSelection = /^\/seleccion(\/|$)/.test(window.location.pathname);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
