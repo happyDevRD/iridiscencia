@@ -18,6 +18,8 @@ collections:
           - { label: "Eslogan", name: "eslogan", widget: "string" }
           - { label: "Ubicación", name: "ubicacion", widget: "string" }
           - { label: "Descripción", name: "descripcion", widget: "text" }
+          - { label: "Razón social", name: "razonSocial", widget: "string", required: false, hint: "Nombre legal tal como figura en la DGII y el registro mercantil (sale en el pie de página)." }
+          - { label: "RNC", name: "rnc", widget: "string", required: false }
           - label: "Fotos de portada"
             name: "heroFotos"
             widget: "list"

@@ -107,9 +107,17 @@ export function ContactoFooter() {
         </motion.p>
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <LogoCompleto className="h-14 text-foreground" />
-          <p>
-            © {new Date().getFullYear()} {siteConfig.nombre}. {siteConfig.ubicacion}.
-          </p>
+          <div>
+            <p>
+              © {new Date().getFullYear()} {siteConfig.nombre}. {siteConfig.ubicacion}.
+            </p>
+            {siteConfig.razonSocial && (
+              <p className="mt-1 text-xs">
+                {siteConfig.razonSocial}
+                {siteConfig.rnc && ` · RNC ${siteConfig.rnc}`}
+              </p>
+            )}
+          </div>
           <p>Fotografía de bodas, XV años, maternidad y retratos.</p>
         </div>
       </div>
