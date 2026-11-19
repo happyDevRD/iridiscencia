@@ -1,6 +1,6 @@
 # Estado de la web (iridiscencia.com) — 2026-10-16
 
-En producción: commit `f4c1910` (2026-10-21, formulario con horas libres de ProStock), servido desde el NAS con `nas/deploy-web.sh`. Para volver a la versión anterior: `nas/deploy-web.sh rollback`.
+En producción: commit `74cbb1d` (2026-11-19, hero de siempre con aviso del especial de Navidad), servido desde el NAS con `nas/deploy-web.sh`. Para volver a la versión anterior: `nas/deploy-web.sh rollback`.
 
 ## Diseño actual
 
@@ -8,7 +8,7 @@ Limpio, sobre blanco, con las fotos de protagonistas. Titulares en **Fraunces** 
 
 | Sección | Componente | Qué hace |
 |---|---|---|
-| Inicio | `hero.tsx` → `heroes/hero-muro.tsx` | Pantalla completa: muro de fotos del NAS inclinado en 3D, con columnas que corren en sentidos opuestos, siguen al mouse y se acercan con el scroll. Titular centrado en blanco y cinta de servicios. Elegido el 2026-10-19 frente al anillo 3D y la foto dentro de las letras |
+| Inicio | `hero.tsx` → `heroes/hero-muro.tsx` (en temporada, aviso dorado «Nuevo set · Navidad en casa» → `#navidad` y destellos; la Navidad nunca sustituye al hero) | Pantalla completa: muro de fotos del NAS inclinado en 3D, con columnas que corren en sentidos opuestos, siguen al mouse y se acercan con el scroll. Titular centrado en blanco y cinta de servicios. Elegido el 2026-10-19 frente al anillo 3D y la foto dentro de las letras |
 | Galería con zoom | `zoom-parallax.tsx` | 7 fotos que se abren desde el centro al hacer scroll |
 | Trabajo reciente | `proyectos-destacados.tsx` | Galería con filtros por categoría y visor |
 | Sesiones | `paquetes.tsx` | Acordeón de fotos con precios y combos de ProStock; carrusel en móvil |
