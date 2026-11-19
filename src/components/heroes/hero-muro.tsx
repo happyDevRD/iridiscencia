@@ -1,6 +1,9 @@
 import { useRef } from "react";
 import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import { Gift } from "lucide-react";
 import siteConfig from "@/content/site.json";
+import { Destellos } from "@/components/navidad-efectos";
+import { NAVIDAD_ACTIVA, cuposRestantes, navidad, textoDescuento } from "@/lib/navidad";
 import { HeroTexto } from "./compartido";
 import { useFotosHero, useTonoHero } from "./usos";
 
@@ -83,7 +86,12 @@ export function HeroMuro() {
         className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgb(0_0_0/0.82),rgb(0_0_0/0.58)_70%,rgb(0_0_0/0.68))]"
       />
 
-      <HeroTexto oscuro centrado className="relative z-10 max-w-5xl px-5" />
+      {NAVIDAD_ACTIVA && <Destellos cantidad={22} className="opacity-70" />}
+
+      <div className="relative z-10 max-w-5xl px-5">
+        {NAVIDAD_ACTIVA && <AvisoNavidad />}
+        <HeroTexto oscuro centrado />
+      </div>
 
       {/* Firma del estudio: abajo a la derecha en escritorio, centrada abajo en el móvil */}
       <motion.p
@@ -95,5 +103,30 @@ export function HeroMuro() {
         Estudio de fotografía · {siteConfig.ubicacion.split(",")[0]}
       </motion.p>
     </section>
+  );
+}
+
+/**
+ * Aviso de temporada encima del titular: el estudio sigue siendo el protagonista y la
+ * Navidad es una invitación a bajar a su sección (`#navidad`).
+ */
+function AvisoNavidad() {
+  const reduce = useReducedMotion();
+  const quedan = cuposRestantes();
+  return (
+    <motion.a
+      href="#navidad"
+      initial={reduce ? false : { opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: EASE, delay: 0.9 }}
+      className="group mx-auto mb-7 flex w-fit max-w-full items-center gap-2.5 rounded-full border border-[var(--oro)]/50 bg-black/35 py-2 pl-3 pr-4 text-left text-sm text-white backdrop-blur-sm transition-colors hover:border-[var(--oro)] hover:bg-black/50 sm:mb-9"
+    >
+      <Gift className="regalo size-4 shrink-0 text-[var(--oro)]" aria-hidden />
+      <span>
+        <span className="brillo-oro font-medium">Nuevo set · {navidad.nombre}</span>
+        {quedan > 0 && <span className="hidden text-white/75 sm:inline"> — {textoDescuento()} para los primeros {navidad.oferta.cupos}</span>}
+      </span>
+      <span aria-hidden className="text-[var(--oro)] transition-transform duration-300 group-hover:translate-y-0.5">↓</span>
+    </motion.a>
   );
 }

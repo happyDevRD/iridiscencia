@@ -5,7 +5,7 @@ import { COTIZAR_EVENT } from "@/lib/contact";
 import { cuposRestantes, navidad, precio, precioConDescuento, textoDescuento, tipoNavidad, type PaqueteNavidad } from "@/lib/navidad";
 import { Lightbox, type LightboxPhoto } from "@/components/lightbox";
 import { FadeUp, RevealText } from "@/components/motion";
-import { Cupos, Destellos } from "@/components/heroes/hero-navidad";
+import { Bokeh, Cupos, Destellos, Guirnalda } from "@/components/navidad-efectos";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -132,19 +132,21 @@ export function Navidad() {
   const conDescuento = cuposRestantes() > 0;
 
   return (
-    <section id="navidad" data-parada="inicio" className="navidad relative overflow-hidden bg-[var(--noche)] py-24 text-white sm:py-32">
+    <section id="navidad" data-parada="inicio" className="navidad relative overflow-hidden bg-[var(--noche)] pb-24 pt-32 text-white sm:pb-32 sm:pt-44">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_80%_0%,rgb(125_29_34/0.35),transparent),radial-gradient(ellipse_50%_40%_at_0%_100%,rgb(31_58_43/0.45),transparent)]"
       />
+      <Bokeh />
       <Destellos cantidad={28} />
+      <Guirnalda className="top-0" />
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
             <p className="antetitulo text-[var(--oro)]">Especial de temporada</p>
             <h2 className="mt-3 leading-none">
               <RevealText as="p" text="El set de" className="text-5xl sm:text-7xl" />
-              <span className="brillo-oro block font-script text-6xl sm:text-8xl">Navidad en casa</span>
+              <span className="brillo-oro block font-script text-6xl sm:text-8xl">{navidad.nombre}</span>
             </h2>
           </div>
           <FadeUp>

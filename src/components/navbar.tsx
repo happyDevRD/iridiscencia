@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const links = [
-  ...(NAVIDAD_ACTIVA ? [{ href: "#navidad", label: "Navidad" }] : []),
   { href: "#trabajo", label: "Trabajo" },
+  ...(NAVIDAD_ACTIVA ? [{ href: "#navidad", label: "Navidad" }] : []),
   { href: "#sesiones", label: "Sesiones" },
   { href: "#proceso", label: "Cómo trabajamos" },
   { href: "#contacto", label: "Contacto" },
