@@ -3,83 +3,118 @@ import { Check, ChevronLeft, ChevronRight, Heart, X, ZoomIn } from "lucide-react
 import LoginScreen from "./LoginScreen";
 import {
   ApiError,
-  clearAuth,
-  loadAuth,
+  accessWithKey,
+  keyFromPath,
+  logout as apiLogout,
   money,
-  saveAuth,
   selectionApi,
   usernameFromPath,
-  type Auth,
   type Selection,
 } from "./api";
 
 /**
- * Portal privado donde el cliente elige sus fotos (iridiscencia.com/seleccion/<usuario>).
- * Entra con usuario + contraseña; lo marcado se guarda solo y al confirmar el estudio lo recibe.
+ * Portal privado donde el cliente elige sus fotos.
+ * - Enlace directo del WhatsApp: iridiscencia.com/seleccion/k_<id>_<firma> → entra sin contraseña.
+ * - Respaldo: iridiscencia.com/seleccion/<usuario> + contraseña de 6 dígitos.
+ * La sesión queda en una cookie HttpOnly (no en la URL ni en el almacenamiento del navegador) y
+ * la dirección se limpia al entrar, así la llave no queda en el historial.
+ * Lo marcado se guarda solo y al confirmar el estudio lo recibe.
  *
  * El orden de marcado importa: las primeras `quota` fotos de la lista son del paquete y las
  * siguientes son adicionales (se cobran aparte). Es posicional: si desmarca una del paquete,
  * la primera adicional pasa a ser del paquete.
  */
 
-const EXPIRED = "Tu sesión terminó. Vuelve a entrar con tu contraseña.";
+const EXPIRED = "Tu sesión terminó. Vuelve a entrar con el enlace del WhatsApp o con tu contraseña.";
 
-function initialAuth(): Auth | null {
-  const stored = loadAuth();
-  const fromPath = usernameFromPath();
-  if (!stored) return null;
-  // Si el enlace es de otro usuario, no reutilizar la sesión guardada.
-  if (fromPath && fromPath.toLowerCase() !== stored.username.toLowerCase()) return null;
-  return stored;
+type Phase = "checking" | "login" | "gallery";
+
+function showPath(path: string) {
+  if (window.location.pathname !== path) window.history.replaceState(null, "", path);
 }
 
 export default function SelectionApp() {
-  const [auth, setAuth] = useState<Auth | null>(initialAuth);
-  const [username, setUsername] = useState(() => auth?.username ?? usernameFromPath());
+  const [phase, setPhase] = useState<Phase>("checking");
+  const [username, setUsername] = useState(() => usernameFromPath());
   const [notice, setNotice] = useState("");
+  const [galleryKey, setGalleryKey] = useState(0);
 
   useEffect(() => {
     document.title = "Elige tus fotos · Iridiscencia";
   }, []);
 
+  // Al abrir: con llave en la ruta → entrar con ella; si no → ¿ya hay sesión (cookie)?
+  // Una sola vez (en desarrollo StrictMode repite los efectos y la llave ya no está en la ruta).
+  const started = useRef(false);
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    const key = keyFromPath();
+    const start = async () => {
+      if (key) {
+        // La llave sale de la barra de direcciones y del historial antes de usarla.
+        showPath("/seleccion");
+        try {
+          const { username: user } = await accessWithKey(key);
+          setUsername(user);
+          showPath(`/seleccion/${encodeURIComponent(user)}`);
+          setPhase("gallery");
+        } catch (e) {
+          setNotice(e instanceof Error ? e.message : "No se pudo abrir el enlace.");
+          setPhase("login");
+        }
+        return;
+      }
+      try {
+        await selectionApi().get();
+        setPhase("gallery");
+      } catch (e) {
+        if (!(e instanceof ApiError && e.status === 401)) setNotice(e instanceof Error ? e.message : "");
+        setPhase("login");
+      }
+    };
+    void start();
+  }, []);
+
   const signOut = useCallback((message = "") => {
-    clearAuth();
-    setAuth(null);
+    void apiLogout();
+    setPhase("login");
     setNotice(message);
   }, []);
 
-  if (!auth) {
+  if (phase === "checking") {
+    return (
+      <Shell>
+        <p className="px-5 pt-24 text-center text-muted-foreground" role="status">
+          Abriendo tu selección…
+        </p>
+      </Shell>
+    );
+  }
+
+  if (phase === "login") {
     return (
       <Shell>
         <LoginScreen
           initialUsername={username}
           notice={notice}
-          onLogin={(session, user) => {
-            const next = { session, username: user };
-            saveAuth(next);
+          onLogin={(user) => {
             setUsername(user);
             setNotice("");
-            setAuth(next);
-            const path = `/seleccion/${encodeURIComponent(user)}`;
-            if (window.location.pathname !== path) window.history.replaceState(null, "", path);
+            showPath(`/seleccion/${encodeURIComponent(user)}`);
+            setGalleryKey((k) => k + 1);
+            setPhase("gallery");
           }}
         />
       </Shell>
     );
   }
 
-  return (
-    <Gallery
-      key={auth.session}
-      session={auth.session}
-      onExpired={() => signOut(EXPIRED)}
-      onLogout={() => signOut()}
-    />
-  );
+  return <Gallery key={galleryKey} onExpired={() => signOut(EXPIRED)} onLogout={() => signOut()} />;
 }
 
-function Gallery({ session, onExpired, onLogout }: { session: string; onExpired: () => void; onLogout: () => void }) {
-  const api = useMemo(() => selectionApi(session), [session]);
+function Gallery({ onExpired, onLogout }: { onExpired: () => void; onLogout: () => void }) {
+  const api = useMemo(() => selectionApi(), []);
   const [data, setData] = useState<Selection | null>(null);
   const [loadError, setLoadError] = useState("");
   const [chosen, setChosen] = useState<string[]>([]);

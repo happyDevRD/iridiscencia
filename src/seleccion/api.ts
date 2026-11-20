@@ -1,7 +1,8 @@
 /**
  * Cliente del portal de selección. El nginx del sitio reenvía /api/seleccion/ → ProStock
- * (/api/public/selection/). El cliente entra con usuario + contraseña y recibe una sesión
- * (12 h) que va en la ruta de cada llamada; un 401 significa que la sesión ya no sirve.
+ * (/api/public/selection/). Se entra con el enlace directo del WhatsApp (/seleccion/k_…) o con
+ * usuario + contraseña; el servidor deja la sesión (12 h) en una cookie HttpOnly y las llamadas
+ * van a /api/seleccion/me/… sin la sesión en la URL. Un 401 significa que la sesión ya no sirve.
  */
 
 export type ExtraStatus = "NONE" | "PENDING" | "APPROVED" | "REJECTED";
@@ -63,14 +64,36 @@ async function call<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+type LoginResult = { username: string };
+
 export const login = (username: string, password: string) =>
-  call<{ session: string }>(`${BASE}/login`, {
+  call<LoginResult>(`${BASE}/login`, {
     method: "POST",
     body: JSON.stringify({ username, password }),
   });
 
-export function selectionApi(session: string) {
-  const base = `${BASE}/${encodeURIComponent(session)}`;
+/** Entra con la llave del enlace directo (k_…); el servidor deja la cookie de sesión. */
+export async function accessWithKey(key: string): Promise<LoginResult> {
+  try {
+    return await call<LoginResult>(`${BASE}/acceso`, { method: "POST", body: JSON.stringify({ key }) });
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 401 && e.message === fallback(401)) {
+      throw new ApiError(401, "Este enlace no es válido. Entra con tu usuario y contraseña.");
+    }
+    throw e;
+  }
+}
+
+export async function logout(): Promise<void> {
+  try {
+    await fetch(`${BASE}/logout`, { method: "POST" });
+  } catch {
+    /* sin red: la cookie vence sola */
+  }
+}
+
+export function selectionApi() {
+  const base = `${BASE}/me`;
   return {
     get: () => call<Selection>(base),
     save: (selected: string[], keepalive = false) =>
@@ -81,46 +104,25 @@ export function selectionApi(session: string) {
   };
 }
 
-/* ---------- Sesión guardada (sessionStorage; si no está disponible, funciona sin guardar) ---------- */
-
-export type Auth = { session: string; username: string };
-const KEY = "iridiscencia.seleccion";
-
-export function loadAuth(): Auth | null {
-  try {
-    const raw = window.sessionStorage.getItem(KEY);
-    if (!raw) return null;
-    const v = JSON.parse(raw);
-    return typeof v?.session === "string" && typeof v?.username === "string" ? v : null;
-  } catch {
-    return null;
-  }
-}
-
-export function saveAuth(auth: Auth) {
-  try {
-    window.sessionStorage.setItem(KEY, JSON.stringify(auth));
-  } catch {
-    /* sin almacenamiento: la sesión dura lo que dure la pestaña */
-  }
-}
-
-export function clearAuth() {
-  try {
-    window.sessionStorage.removeItem(KEY);
-  } catch {
-    /* nada que borrar */
-  }
-}
-
-/** Usuario que viene en la ruta: /seleccion/<usuario>. */
-export function usernameFromPath(): string {
+function pathSegment(): string {
   const raw = window.location.pathname.replace(/^\/seleccion\/?/, "").split("/")[0] ?? "";
   try {
     return decodeURIComponent(raw).trim();
   } catch {
     return raw.trim();
   }
+}
+
+/** Llave del enlace directo que viene en la ruta: /seleccion/k_<id>_<firma>. */
+export function keyFromPath(): string {
+  const seg = pathSegment();
+  return seg.startsWith("k_") ? seg : "";
+}
+
+/** Usuario que viene en la ruta: /seleccion/<usuario> (no la llave del enlace directo). */
+export function usernameFromPath(): string {
+  const seg = pathSegment();
+  return seg.startsWith("k_") ? "" : seg;
 }
 
 export const money = (n: number) =>
