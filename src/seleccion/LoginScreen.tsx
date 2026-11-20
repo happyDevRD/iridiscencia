@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { ApiError, login } from "./api";
 
-/** Entrada al portal: usuario (viene en el enlace de WhatsApp) + contraseña de 6 dígitos. */
+/** Entrada de respaldo al portal: usuario + contraseña de 6 dígitos (el enlace del WhatsApp entra solo). */
 export default function LoginScreen({
   initialUsername,
   notice,
@@ -10,7 +10,7 @@ export default function LoginScreen({
 }: {
   initialUsername: string;
   notice?: string;
-  onLogin: (session: string, username: string) => void;
+  onLogin: (username: string) => void;
 }) {
   const [username, setUsername] = useState(initialUsername);
   const [password, setPassword] = useState("");
@@ -28,8 +28,8 @@ export default function LoginScreen({
     setSending(true);
     setError("");
     try {
-      const { session } = await login(user, password);
-      onLogin(session, user);
+      const { username: canonical } = await login(user, password);
+      onLogin(canonical || user);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "No se pudo entrar. Intenta de nuevo.");
       setPassword("");
@@ -45,7 +45,8 @@ export default function LoginScreen({
       <p className="text-muted-foreground">Portal de clientes</p>
       <h1 className="mt-2 font-display text-5xl leading-none">Elige tus fotos</h1>
       <p className="mt-4 leading-relaxed text-muted-foreground">
-        Entra con tu usuario y la contraseña de 6 dígitos que te enviamos por WhatsApp.
+        Toca el botón «Elegir mis fotos» del WhatsApp que te enviamos y entrarás directo. Si no lo
+        tienes a mano, entra con tu usuario y la contraseña de 6 dígitos que te dio el estudio.
       </p>
 
       {notice && (
